@@ -215,7 +215,7 @@ Multiple choice questions must have the following additional properties:
 
 | Property | Type | Description | Example |
 | ------ | ------ | ------ | ------ |
-| ```radio``` | Boolean | Denotes whether the multiple choice should be radio buttons (one selection only) or checkboxes (multiple selections allowed). | ```"radio": "true"``` |
+| ```radio``` | Boolean | Denotes whether the multiple choice should be radio buttons (one selection only) or checkboxes (multiple selections allowed). | ```"radio": true``` |
 | ```options``` | Array | The list of choices to display. | ```"options": [ "Dog", "Cat", "Fish" ]``` |
 
 ##### Media
