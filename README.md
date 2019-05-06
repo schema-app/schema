@@ -53,16 +53,14 @@ To host your own study on the schema platform, the following steps are required:
 ### Study protocol
 A study protocol is defined in a JSON file. At the highest level, this file contains two objects: the *properties* object which stores the metadata about the study; and the *modules* object which stores the individual survey/intervention tasks that will be delivered to the participants.
 
-```json
-{
-  "properties": {
-    ...
-  },
-  "modules": [
-    ...
-  ]
-}
-```
+    {
+        "properties": {
+            ...
+        },
+        "modules": [
+            ...
+        ]
+    }
 
 #### Properties
 The properties object must define the following attributes:
