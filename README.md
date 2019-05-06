@@ -1,4 +1,5 @@
 [![schema](https://ashatte.io/img/schema.png)](https://ashatte.io/schema/)
+
 # schema
 
 [![GooglePlay](https://ashatte.io/img/google-play-badge-300x89.png)](https://ashatte.io/) [![AppStore](https://ashatte.io/img/download-on-the-app-store.png)](https://ashatte.io)
@@ -52,16 +53,18 @@ To host your own study on the schema platform, the following steps are required:
 * Create a page on a server to receive post requests and save data
 
 ### Study protocol
-A study protocol is defined in a JSON file. At the highest level, this file contains two objects: the *properties* object which stores the metadata about the study; and the *modules* object which stores the individual survey/intervention tasks that will be delivered to the participants.
+A study protocol is defined in a JSON file. At the highest level, this file contains two attributes: the *properties* object which stores the metadata about the study; and the *modules* array which stores the individual survey/intervention tasks that will be delivered to the participants.
 
-    {
-        "properties": {
-            ...
-        },
-        "modules": [
-            ...
-        ]
-    }
+```
+{
+  "properties": {
+    /* property attributes */
+  },
+  "modules": [
+    /* module objects */
+  ]
+}
+```
 
 #### Properties
 The properties object must define the following attributes:
@@ -78,7 +81,40 @@ The properties object must define the following attributes:
 | ```post_url``` | String | An endpoint to receive participant responses (POST data) from the app. | ```"post_url": "https://getschema.app/post.php"``` |
 | ```conditions``` | Array | A list of conditions that participants can be randomised into. | ```"conditions": [ "Control", "Intervention" ] ```
 
+#### Modules
+The modules array contains all of the information, surveys and/or interventions that will be delivered to the participants of your study. A module object has this high-level structure:
+
+```
+{
+  "type": "...",
+  "name": "...",
+  "submit_txt": "...",
+  "condition": "...",
+  "alerts": {
+      /* alert properties */
+  },
+  "graph": {
+      /* graph properties */
+  }, 
+  "sections": [
+      /* section objects with questions */
+  ]
+ }
+```
+The properties of a module object are defined as follows:
+
+| Property | Type | Description | Example |
+| ------ | ------ | ------ | ------ |
+| ```type``` | String | The type of the module. Accepted values are ```survey```, ```info```, ```video```, and ```audio```. | ```"type": "survey"``` |
+| ```name``` | String | The name of the module. | ```"name": "Daily Checklist"``` |
+| ```submit_txt``` | String | The label of the submit button for this module. Note: this value appears only on the final section of a module. | ```"submit_txt": "Finish"``` |
+| ```condition``` | String | The condition that this module belongs to. It must match one of the values from the ```conditions``` array from the study properties. | ```"condition":"Control"``` |
+| ```alerts``` | Object | Contains information about the scheduling of this module. Used to control access to the task and set notifications. | See *alerts* docs. |
+| ```graph``` | Object | Contains information about the graph relating to this module (if any). Used to render the graph in the Feedback tab. | See *graph* docs. | 
+| ```sections``` | Array | An array of section objects that contain the questions/elements for this module. | See *sections* docs. |
+
+
 License
 ----
 
-MIT
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
