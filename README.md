@@ -109,9 +109,9 @@ The properties of a module object are defined as follows:
 | ```name``` | String | The name of the module. | ```"name": "Daily Checklist"``` |
 | ```submit_txt``` | String | The label of the submit button for this module. Note: this value appears only on the final section of a module. | ```"submit_txt": "Finish"``` |
 | ```condition``` | String | The condition that this module belongs to. It must match one of the values from the ```conditions``` array from the study properties. | ```"condition":"Control"``` |
-| ```alerts``` | Object | Contains information about the scheduling of this module. Used to control access to the task and set notifications. | See *alerts* docs. |
-| ```graph``` | Object | Contains information about the graph relating to this module (if any). Used to render the graph in the Feedback tab. | See *graph* docs. | 
-| ```sections``` | Array | An array of section objects that contain the questions/elements for this module. | See *sections* docs. |
+| ```alerts``` | Object | Contains information about the scheduling of this module. Used to control access to the task and set notifications. | See *alerts*. |
+| ```graph``` | Object | Contains information about the graph relating to this module (if any). Used to render the graph in the Feedback tab. | See *graph*. | 
+| ```sections``` | Array | An array of section objects that contain the questions/elements for this module. | See *sections*. |
 
 ##### Alerts
 The alerts object must define the following attributes:
@@ -131,24 +131,37 @@ The graphs object must define the following attributes:
 
 | Property | Type | Description | Example |
 | ------ | ------ | ------ | ------ |
-| ```display``` | Boolean | | ```"display": true``` |
-| ```variable``` | String | | ```"variable": "q4"``` |
-| ```title``` | String | | ```"title": "Daily sleep"``` |
-| ```blurb``` | String | | ```"blurb": "Your daily sleep in hours"``` |
-| ```type``` | String | | ```"type": "line"``` | 
-| ```max_points``` | Integer | | ```"max_points": 10``` | 
+| ```display``` | Boolean | Indicates whether this module displays a feedback graph in the Feedback tab. If the value is ```false```, the remaining variables are ignored. | ```"display": true``` |
+| ```variable``` | String | The ```id``` of a question object to graph. It must match one of the module's question ids. | ```"variable": "q4"``` |
+| ```title``` | String | The title of the graph to be displayed in the Feedback tab. | ```"title": "Daily sleep"``` |
+| ```blurb``` | String | A brief description of the graph to be displayed below it in the feedback tab. | ```"blurb": "Your daily sleep in hours"``` |
+| ```type``` | String | The type of graph. Currently ```bar``` and ```line``` are supported. | ```"type": "line"``` | 
+| ```max_points``` | Integer | The maximum number of data points to display in the graph, e.g. ```10``` will only show the ten most recent responses. | ```"max_points": 10``` | 
 
 ##### Sections
 The sections array contains one or many section objects, which have this high level structure:
 
-    "sections": [
-        {
-            "name": "Demographics",
-            "questions": [
-                /* question objects */
-            ]
-        }
-    ]
+    {
+        "name": "Demographics",
+        "questions": [
+            /* question objects */
+        ]
+    }
+
+The properties are defined as follows:
+
+| Property | Type | Description | Example |
+| ------ | ------ | ------ | ------ |
+| ```name``` | String | The title of this section, which is displayed at the top of the screen. | ```"name": "Demographics"``` | 
+| ```questions``` | Array | An array containing all of the questions for this section of the module. | See *questions*. |
+
+#### Questions
+There are several question objects that can be added to a section. 
+
+
+
+#### Branching
+
 License
 ----
 
