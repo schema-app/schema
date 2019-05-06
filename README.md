@@ -82,7 +82,7 @@ The properties object must define the following attributes:
 | ```conditions``` | Array | A list of conditions that participants can be randomised into. | ```"conditions": [ "Control", "Intervention" ] ```
 
 #### Modules
-The modules array contains all of the information, surveys and/or interventions that will be delivered to the participants of your study. A module object has this high-level structure:
+The modules array contains one or many module objects, which encapsulate the surveys and/or interventions that will be delivered to the participants of your study. A module object has this high-level structure:
 
 ```
 {
@@ -113,7 +113,42 @@ The properties of a module object are defined as follows:
 | ```graph``` | Object | Contains information about the graph relating to this module (if any). Used to render the graph in the Feedback tab. | See *graph* docs. | 
 | ```sections``` | Array | An array of section objects that contain the questions/elements for this module. | See *sections* docs. |
 
+##### Alerts
+The alerts object must define the following attributes:
 
+| Property | Type | Description | Example |
+| ------ | ------ | ------ | ------ |
+| ```startOffset``` | Integer | Indicates when the module should first be displayed to the user, where zero is the day that the participant enrolled.  | ```"startOffset": 1``` |
+| ```duration``` | Integer | Indicates the number of consecutive days that the module should be scheduled to display.  | ```"duration": 3``` |
+| ```times``` | Array | The times that this module should be scheduled for each day. ```hours``` indicates the hours (24-hour time) and ```minutes``` indicates the minutes (so should be between 0 and 59).  | ```"times": [ { "hours": 8, "minutes": 30 } ]``` |
+| ```random``` | Boolean | Indicates whether the alert times should be randomised. If true, each value from ```times``` will be set using the value of ```randomInterval```. | ```"random": true``` |
+| ```randomInterval``` | Integer | The number of minutes before and after that an alert time should be randomised. For example, if the alert is scheduled for 8.30am and the ```randomInterval``` is 30, the alert will be scheduled randomly between 8 and 9am. | ```"randomInterval": 30``` |
+| ```sticky``` | boolean | CHECK THIS ONE | |
+| ```timeout``` | | CHECK THIS ONE | |
+
+##### Graph
+The graphs object must define the following attributes:
+
+| Property | Type | Description | Example |
+| ------ | ------ | ------ | ------ |
+| ```display``` | Boolean | | ```"display": true``` |
+| ```variable``` | String | | ```"variable": "q4"``` |
+| ```title``` | String | | ```"title": "Daily sleep"``` |
+| ```blurb``` | String | | ```"blurb": "Your daily sleep in hours"``` |
+| ```type``` | String | | ```"type": "line"``` | 
+| ```max_points``` | Integer | | ```"max_points": 10``` | 
+
+##### Sections
+The sections array contains one or many section objects, which have this high level structure:
+
+    "sections": [
+        {
+            "name": "Demographics",
+            "questions": [
+                /* question objects */
+            ]
+        }
+    ]
 License
 ----
 
