@@ -156,7 +156,31 @@ The properties are defined as follows:
 | ```questions``` | Array | An array containing all of the questions for this section of the module. | See *questions*. |
 
 #### Questions
-There are several question objects that can be added to a section. 
+There are several types of question object that can be added to a section, including:
+
+* Instruction
+* Text Input
+* Date/Time
+* Yes/No (boolean)
+* Slider
+* Multiple Choice
+* Video
+* Audio
+* Image
+
+All question objects must include the following properties:
+
+| Property | Type | Description | Example |
+| ------ | ------ | ------ | ------ |
+| ```id``` | String | A unique id to identify this question. This id is sent to the server along with any response value. | ```"id": "q1"``` |
+| ```type``` | String | ```instruction```, ```datetime```, ```multi```, ```text```, ```slider```, ```video```, ```audio```, ```image```, ```yesno``` | ```"type": "slider"``` |
+| ```text``` | String | The label displayed alongside the question. | ```"text": "How do you feel?"``` |
+| ```required``` | Boolean | Denotes whether this question is required to be answered. The app will force the participant to answer all required questions that are not hidden by branching. | ```"required": true``` | 
+
+Many question types have additional properties that they must include, which are outlined in the following sections.
+
+##### Text Input
+Text Input questions must have the following properties:
 
 
 
