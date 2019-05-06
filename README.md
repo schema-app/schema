@@ -164,8 +164,7 @@ There are several types of question object that can be added to a section, inclu
 * Yes/No (boolean)
 * Slider
 * Multiple Choice
-* Video
-* Audio
+* Media
 * Image
 
 All question objects must include the following properties:
@@ -180,11 +179,64 @@ All question objects must include the following properties:
 Many question types have additional properties that they must include, which are outlined in the following sections.
 
 ##### Text Input
-Text Input questions must have the following properties:
+Text Input questions must have the following additional property:
 
+| Property | Type | Description | Example |
+| ------ | ------ | ------ | ------ |
+| ```subtype``` | String | The specific type of text input for this field. Accepted values are ```short```, ```long```, and ```numeric```. | ```"subtype": "long"``` |
 
+##### Date/Time
+Date/Time questions must have the following additional property:
+
+| Property | Type | Description | Example |
+| ------ | ------ | ------ | ------ |
+| ```subtype``` | String | The specific type of date/time input for this field. Accepted values are ```date```, ```time```, and ```datetime```. | ```"subtype": "time"``` |  
+
+##### Yes/No
+Yes/No questions must have the following additional properties:
+
+| Property | Type | Description | Example |
+| ------ | ------ | ------ | ------ |
+| ```yes_text``` | String | The label for a true/yes response. | ```"yes_text": "Agree"``` | 
+| ```no_text``` | String | The label for a false/no response. | ```"no_text": "Disagree"``` |
+
+##### Slider
+Slider questions must have the following additional properties:
+
+| Property | Type | Description | Example |
+| ------ | ------ | ------ | ------ |
+| ```min``` | Integer | The minimum value for the slider range. | ```"min": 0``` |
+| ```max``` | Integer | The maximum value for the slider range. | ```"max": 100``` |
+| ```hint_left``` | String | A label displayed to the left of the slider. | ```"hint_left": "less"``` |
+| ```hint_right``` | String | A label displayed to the right of the slider. | ```"hint_right": "more"``` |
+
+##### Multiple Choice
+Multiple choice questions must have the following additional properties:
+
+| Property | Type | Description | Example |
+| ------ | ------ | ------ | ------ |
+| ```radio``` | Boolean | Denotes whether the multiple choice should be radio buttons (one selection only) or checkboxes (multiple selections allowed). | ```"radio": "true"``` |
+| ```options``` | Array | The list of choices to display. | ```"options": [ "Dog", "Cat", "Fish" ]``` |
+
+##### Media
+Media questions must have the following additional properties:
+
+| Property | Type | Description | Example |
+| ------ | ------ | ------ | ------ |
+| ```subtype``` | String | The type of media. Accepted values are ```video``` and ```audio```. | ```"subtype": "video"``` | 
+| ```src``` | String | A direct URL to the media source. | ```"src": "https://getschema.app/video.mp4"``` |
+
+##### Image
+Image questions must have the following additional property:
+
+| Property | Type | Description | Example |
+| ------ | ------ | ------ | ------ |
+| ```src``` | String | A direct URL to the image source. | ```"src": "https://getschema.app/image.png"``` |
 
 #### Branching
+Currently, branching is supported by the ```multi```, ```yesno```, and ```slider``` question types. To use branching, you need to a few additional properties to the question object that is to be dynamically shown/hidden.
+
+### Server Values
 
 License
 ----
