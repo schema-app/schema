@@ -1,3 +1,4 @@
+[![schema](https://ashatte.io/img/schema.png)](https://ashatte.io/schema/)
 # schema
 
 [![GooglePlay](https://ashatte.io/img/google-play-badge-300x89.png)](https://ashatte.io/) [![AppStore](https://ashatte.io/img/download-on-the-app-store.png)](https://ashatte.io)
