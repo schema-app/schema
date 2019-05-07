@@ -243,7 +243,19 @@ To use branching, you need to add two additional properties to the question obje
                      
 Currently, branching is supported by the ```multi```, ```yesno```, and ```slider``` question types. 
 
-### Server Values
+### Collecting data
+The ```post_url``` defined in the study protocol's properties object should point to an endpoint that can receive POST requests. schema posts the following variables to the server whenever a task is completed:
+
+| POST id | Type | Description |
+| ------ | ------ | ------ | 
+| ```study_id``` | String | The identifier of the study taken from the ```study_id``` property of the study protocol. |
+| ```user_id``` | String | The unique id of the user. |
+| ```platform``` | String | The platform the user responded on. Value will be ```ios``` or ```android```. |
+| ```module_index``` | Integer | The index of the module in the ```modules``` array (zero-based).  | 
+| ```module_name``` | String | The name of the module. | 
+| ```responses``` | Array (verify this) | The questions responses for this task, provided as a collection of key-value pairs. The key is the ```id``` of the question, for example ```{ "q1": 56 }, { "q2": "No" }```. |
+| ```response_time``` | Timestamp | The timestamp when the module was completed, in the user's local time. |
+
 
 License
 ----
