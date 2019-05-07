@@ -234,7 +234,14 @@ Image questions must have the following additional property:
 | ```src``` | String | A direct URL to the image source. | ```"src": "https://getschema.app/image.png"``` |
 
 #### Branching
-Currently, branching is supported by the ```multi```, ```yesno```, and ```slider``` question types. To use branching, you need to a few additional properties to the question object that is to be dynamically shown/hidden.
+To use branching, you need to add two additional properties to the question object that is to be dynamically shown/hidden.
+
+| Property | Type | Description | Example |
+| ------ | ------ | ------ | ------ |
+| ```hideID``` | String | The ```id``` of the question that will trigger this question to dynamically show/hide. | ```"hideID": "q5"``` |
+| ```hideValue``` | String/Boolean | The value that needs to be selected in the question denoted by ```hideID``` which will make this question appear. When using sliders, the value should be prefixed with a direction and is inclusive, e.g. ```>50``` or ```<50```. | ```"hideValue": "10"``` |
+                     
+Currently, branching is supported by the ```multi```, ```yesno```, and ```slider``` question types. 
 
 ### Server Values
 
