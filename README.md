@@ -166,14 +166,13 @@ There are several types of question object that can be added to a section, inclu
 * Slider
 * Multiple Choice
 * Media
-* Image
 
 All question objects must include the following properties:
 
 | Property | Type | Description | Example |
 | ------ | ------ | ------ | ------ |
 | ```id``` | String | A unique id to identify this question. This id is sent to the server along with any response value. | ```"id": "q1"``` |
-| ```type``` | String | ```instruction```, ```datetime```, ```multi```, ```text```, ```slider```, ```video```, ```audio```, ```image```, ```yesno``` | ```"type": "slider"``` |
+| ```type``` | String | The primary type of this question. Accepted values are ```instruction```, ```datetime```, ```multi```, ```text```, ```slider```, ```video```, ```audio```, and ```yesno```. | ```"type": "slider"``` |
 | ```text``` | String | The label displayed alongside the question. | ```"text": "How do you feel?"``` |
 | ```required``` | Boolean | Denotes whether this question is required to be answered. The app will force the participant to answer all required questions that are not hidden by branching. | ```"required": true``` | 
 
