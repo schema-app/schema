@@ -120,11 +120,11 @@ The alerts object must define the following attributes:
 
 | Property | Type | Description | Example |
 | ------ | ------ | ------ | ------ |
-| ```startOffset``` | Integer | Indicates when the module should first be displayed to the user, where zero is the day that the participant enrolled.  | ```"startOffset": 1``` |
+| ```start_offset``` | Integer | Indicates when the module should first be displayed to the user, where zero is the day that the participant enrolled.  | ```"start_offset": 1``` |
 | ```duration``` | Integer | Indicates the number of consecutive days that the module should be scheduled to display.  | ```"duration": 3``` |
 | ```times``` | Array | The times that this module should be scheduled for each day. ```hours``` indicates the hours (24-hour time) and ```minutes``` indicates the minutes (so should be between 0 and 59).  | ```"times": [ { "hours": 8, "minutes": 30 } ]``` |
 | ```random``` | Boolean | Indicates whether the alert times should be randomised. If true, each value from ```times``` will be set using the value of ```randomInterval```. | ```"random": true``` |
-| ```randomInterval``` | Integer | The number of minutes before and after that an alert time should be randomised. For example, if the alert is scheduled for 8.30am and the ```randomInterval``` is 30, the alert will be scheduled randomly between 8 and 9am. | ```"randomInterval": 30``` |
+| ```random_interval``` | Integer | The number of minutes before and after that an alert time should be randomised. For example, if the alert is scheduled for 8.30am and the ```randomInterval``` is 30, the alert will be scheduled randomly between 8 and 9am. | ```"random_interval": 30``` |
 | ```sticky``` | boolean | Indicates whether the module should remain available in the Tasks list upon response, allowing the user to access this module repeatedly. | ```"sticky": true``` |
 | ```timeout``` | | CHECK THIS ONE | |
 
