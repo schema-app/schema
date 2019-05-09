@@ -120,6 +120,8 @@ The alerts object must define the following attributes:
 
 | Property | Type | Description | Example |
 | ------ | ------ | ------ | ------ |
+| ```title``` | String | The title that is displayed in the notification (main text). | ```"title": "Time to check in!``` |
+| ```message``` | String | The message that is displayed in the notification (secondary text). | ```"message": "Tap here to open the app."``` |
 | ```start_offset``` | Integer | Indicates when the module should first be displayed to the user, where zero is the day that the participant enrolled.  | ```"start_offset": 1``` |
 | ```duration``` | Integer | Indicates the number of consecutive days that the module should be scheduled to display.  | ```"duration": 3``` |
 | ```times``` | Array | The times that this module should be scheduled for each day. ```hours``` indicates the hours (24-hour time) and ```minutes``` indicates the minutes (so should be between 0 and 59).  | ```"times": [ { "hours": 8, "minutes": 30 } ]``` |
