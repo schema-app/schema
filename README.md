@@ -192,7 +192,7 @@ Date/Time questions must have the following additional property:
 
 | Property | Type | Description | Example |
 | ------ | ------ | ------ | ------ |
-| ```subtype``` | String | The specific type of date/time input for this field. Accepted values are ```date```, ```time```, and ```datetime```. | ```"subtype": "time"``` |  
+| ```subtype``` | String | The specific type of date/time input for this field. Accepted values are ```date``` (datepicker only), ```time``` (timepicker only), and ```datetime``` (both). | ```"subtype": "time"``` |  
 
 ##### Yes/No
 Yes/No questions must have the following additional properties:
