@@ -248,7 +248,7 @@ The ```post_url``` defined in the study protocol's properties object should poin
 | ```platform``` | String | The platform the user responded on. Value will be ```ios``` or ```android```. |
 | ```module_index``` | Integer | The index of the module in the ```modules``` array (zero-based).  | 
 | ```module_name``` | String | The name of the module. | 
-| ```responses``` | Array (verify this) | The questions responses for this task, provided as a collection of key-value pairs. The key is the ```id``` of the question, for example ```{ "q1": 56 }, { "q2": "No" }```. |
+| ```responses``` | String | The questions responses for this task, provided as a stringified JSON object. The key is the ```id``` of the question, for example ```{ "q1": 56 , "q2": "No", "q3": "" }```. |
 | ```response_time``` | Timestamp | The timestamp when the module was completed, in the user's local time, e.g. ```2019-05-08T23:16:21+10:00```. |
 
 
