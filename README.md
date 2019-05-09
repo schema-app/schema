@@ -37,6 +37,7 @@ schema uses the following Ionic Native plugins to achieve native functionality:
 | ------ | ------ |
 | Barcode Scanner | [https://ionicframework.com/docs/native/barcode-scanner](https://ionicframework.com/docs/native/barcode-scanner) |
 | LocalNotifications | [https://ionicframework.com/docs/native/local-notifications](https://ionicframework.com/docs/native/local-notifications) |
+| SQLite | [https://ionicframework.com/docs/native/sqlite](https://ionicframework.com/docs/native/sqlite) |
 
 ## Installation
 
