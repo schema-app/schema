@@ -108,7 +108,7 @@ The properties of a module object are defined as follows:
 | ```type``` | String | The type of the module. Accepted values are ```survey```, ```info```, ```video```, and ```audio```. | ```"type": "survey"``` |
 | ```name``` | String | The name of the module. | ```"name": "Daily Checklist"``` |
 | ```submit_txt``` | String | The label of the submit button for this module. Note: this value appears only on the final section of a module. | ```"submit_txt": "Finish"``` |
-| ```condition``` | String | The condition that this module belongs to. It must match one of the values from the ```conditions``` array from the study properties. | ```"condition":"Control"``` |
+| ```condition``` | String | The condition that this module belongs to. It must match one of the values from the ```conditions``` array from the study properties, or have the value ```*``` to be scheduled for all participants. | ```"condition":"Control"``` |
 | ```alerts``` | Object | Contains information about the scheduling of this module. Used to control access to the task and set notifications. | See *alerts*. |
 | ```graph``` | Object | Contains information about the graph relating to this module (if any). Used to render the graph in the Feedback tab. | See *graph*. | 
 | ```sections``` | Array | An array of section objects that contain the questions/elements for this module. | See *sections*. |
@@ -223,15 +223,8 @@ Media questions must have the following additional properties:
 
 | Property | Type | Description | Example |
 | ------ | ------ | ------ | ------ |
-| ```subtype``` | String | The type of media. Accepted values are ```video``` and ```audio```. | ```"subtype": "video"``` | 
+| ```subtype``` | String | The type of media. Accepted values are ```video```, ```audio```, and ```image```. | ```"subtype": "video"``` | 
 | ```src``` | String | A direct URL to the media source. | ```"src": "https://getschema.app/video.mp4"``` |
-
-##### Image
-Image questions must have the following additional property:
-
-| Property | Type | Description | Example |
-| ------ | ------ | ------ | ------ |
-| ```src``` | String | A direct URL to the image source. | ```"src": "https://getschema.app/image.png"``` |
 
 #### Branching
 To use branching, you need to add two additional properties to the question object that is to be dynamically shown/hidden.
@@ -254,7 +247,7 @@ The ```post_url``` defined in the study protocol's properties object should poin
 | ```module_index``` | Integer | The index of the module in the ```modules``` array (zero-based).  | 
 | ```module_name``` | String | The name of the module. | 
 | ```responses``` | Array (verify this) | The questions responses for this task, provided as a collection of key-value pairs. The key is the ```id``` of the question, for example ```{ "q1": 56 }, { "q2": "No" }```. |
-| ```response_time``` | Timestamp | The timestamp when the module was completed, in the user's local time. |
+| ```response_time``` | Timestamp | The timestamp when the module was completed, in the user's local time, e.g. ```2019-05-08T23:16:21+10:00```. |
 
 
 License
