@@ -247,7 +247,7 @@ The ```post_url``` defined in the study protocol's properties object should poin
 | ------ | ------ | ------ | 
 | ```study_id``` | String | The identifier of the study taken from the ```study_id``` property of the study protocol. |
 | ```user_id``` | String | The unique id of the user. |
-| ```platform``` | String | The platform the user responded on. Value will be ```ios``` or ```android```. |
+| ```platform``` | String | The platform the user responded on. Value will be ```iphone``` or ```android```. |
 | ```module_index``` | Integer | The index of the module in the ```modules``` array (zero-based).  | 
 | ```module_name``` | String | The name of the module. | 
 | ```responses``` | String | The questions responses for this task, provided as a stringified JSON object. The key is the ```id``` of the question, for example ```{ "q1": 56 , "q2": "No", "q3": "" }```. |
