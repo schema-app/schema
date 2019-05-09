@@ -76,6 +76,7 @@ The properties object must define the following attributes:
 | ```study_name``` | String | The name of the current study. | ```"study_name": "Sleep Study"``` |
 | ```created_by``` | String | The creator of the study, displayed in the app. | ```"created_by": "Psych College"``` |
 | ```description``` | String | A brief description of the study that is displayed in the app. | ```"description": "This study will track your sleep."``` |
+| ```banner_url``` | String | The URL to an image that will be displayed on the home page of your study. It will be displayed at 100% width and maintain the aspect ratio of the original image. | ```"banner_url": "https://getschema.app/banner.png"``` |
 | ```support_email``` | String | An email address that participants can contact for support with the study. | ```"support_email": "support@getschema.app"``` |
 | ```support_url``` | String | A web link to the study's homepage or support information that is linked to in the app. | ```"support_url": "https://getschema.app/"``` |
 | ```empty_msg``` | String | A message displayed to the user when there are no tasks currently available to complete. | ```"empty_msg": "Relax, you're all up to date."``` |
