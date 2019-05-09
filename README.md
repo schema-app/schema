@@ -126,7 +126,8 @@ The alerts object must define the following attributes:
 | ```random``` | Boolean | Indicates whether the alert times should be randomised. If true, each value from ```times``` will be set using the value of ```randomInterval```. | ```"random": true``` |
 | ```random_interval``` | Integer | The number of minutes before and after that an alert time should be randomised. For example, if the alert is scheduled for 8.30am and the ```randomInterval``` is 30, the alert will be scheduled randomly between 8 and 9am. | ```"random_interval": 30``` |
 | ```sticky``` | boolean | Indicates whether the module should remain available in the Tasks list upon response, allowing the user to access this module repeatedly. | ```"sticky": true``` |
-| ```timeout``` | | CHECK THIS ONE | |
+| ```timeout``` | Boolean | If ```timeout``` is true, the task will disappear from the list after the ```timeout_limit``` has been reached (if not responded to before). | ```"timeout": true``` |
+| ```timeout_limit``` | Integer | The number of minutes after a task is displayed that it will disappear from the list. ```timeout``` must be ```true``` for this to have any effect. | ```"timeout_limit": 30``` |
 
 ##### Graph
 The graphs object must define the following attributes:
