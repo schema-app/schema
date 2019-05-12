@@ -1,0 +1,18 @@
+#section-title {
+    font-weight:50;
+}
+
+.videoPlayer {
+    width:100%;
+}
+
+.showError:before { content:" *"; }
+
+.showError {
+    font-weight:bold;
+    color:#F44336 !important;
+}
+
+.scroll-content {
+    padding-bottom: 0 !important;
+ }

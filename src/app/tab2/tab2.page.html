@@ -1,9 +1,38 @@
 <ion-header>
-  <ion-toolbar>
+  <ion-toolbar color="primary">
     <ion-title>
-      Tab Two
+      <img class="header-icon" src="assets/imgs/small-icon.png">
+      <span class="header-title-thin">sch</span><strong>ema</strong>
     </ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content></ion-content>
+<ion-content>
+
+  <ion-item lines="none" *ngIf="!graphs.length > 0">
+    <ion-label text-center text-wrap>
+      <br><br>
+      <ion-icon id="stats-icon" color="secondary" name="stats"></ion-icon><br><br>
+      As you complete tasks, your progress will be updated in this tab.
+    </ion-label>
+  </ion-item>
+
+  <div *ngFor="let graph of graphs">
+      <ion-item-divider color="light">{{graph.header}}</ion-item-divider>
+      <canvas style="margin-left:10px;margin-right:10px;padding-right:20px;" baseChart 
+        [datasets]="graph.data"
+        [labels]="graph.labels"
+        [options]="graph.options"
+        [colors]="graph.colors"
+        [legend]="graph.legend"
+        [chartType]="graph.type">
+      </canvas>
+      <ion-item lines="full">
+        <ion-label>
+          <p style="font-size:13px;">{{graph.blurb}}</p>
+        </ion-label>
+      </ion-item>
+      
+    </div>
+
+</ion-content>

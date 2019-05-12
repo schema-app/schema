@@ -9,3 +9,14 @@
 @import '~@ionic/angular/css/text-alignment.css';
 @import '~@ionic/angular/css/text-transformation.css';
 @import '~@ionic/angular/css/flex-utils.css';
+
+
+// schema themes
+.header-icon {
+    max-height:16px;
+}
+
+.header-title-thin {
+    font-weight:50;
+    padding-left:5px;
+}
