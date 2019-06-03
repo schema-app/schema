@@ -162,7 +162,7 @@ export class StudyTasksService {
             }
           }
           else if (task.sticky) {
-            tasks_to_display.unshift(task);
+            tasks_to_display.push(task);
           }
           else if (!task.completed) {
             tasks_to_display.push(task);

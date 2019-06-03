@@ -1,11 +1,12 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router, NavigationStart } from '@angular/router';
 import { Storage } from '@ionic/storage';
 import { StatusBar } from '@ionic-native/status-bar/ngx';
-import { AlertController, LoadingController } from '@ionic/angular';
+import { AlertController } from '@ionic/angular';
 import { BarcodeScanner } from '@ionic-native/barcode-scanner/ngx';
 import { SurveyDataService } from '../services/survey-data.service';
 import { StudyTasksService } from '../services/study-tasks.service';
+import { SurveyCacheService } from '../services/survey-cache.service';
 import { UuidService } from '../services/uuid.service';
 import { LoadingService } from '../services/loading-service.service';
 import { NotificationsService } from '../services/notifications.service';
@@ -21,22 +22,25 @@ import { _iterableDiffersFactory } from '@angular/core/src/application_module';
 export class Tab1Page {
 
   // flag to display enrol options
-  private hideEnrolOptions = true;
+  hideEnrolOptions = true;
   // track whether the user is currently enrolled in a study
-  private isEnrolledInStudy = false;
+  isEnrolledInStudy = false;
   // stores the details of the study
-  private study;
+  study = null;
   // stores the list of tasks to be completed by the user
-  private task_list;
+  task_list = [];
+
+  
+  safeURL;
 
   constructor(private barcodeScanner : BarcodeScanner,
     private surveyDataService : SurveyDataService,
     private notificationsService : NotificationsService,
+    private surveyCacheService : SurveyCacheService,
     private studyTasksService : StudyTasksService,
     private uuidService : UuidService,
     private router : Router,
     private statusBar : StatusBar,
-    private loadingController : LoadingController,
     private loadingService : LoadingService,
     private alertController : AlertController,
     private localNotifications : LocalNotifications,
@@ -68,7 +72,10 @@ export class Tab1Page {
 
   ionViewWillEnter() {
 
-    this.loadingService.present();
+    this.localNotifications.requestPermission();
+
+    this.loadingService.isCaching = false;
+    this.loadingService.present("Loading...");
 
     this.hideEnrolOptions = true;
     this.isEnrolledInStudy = false;
@@ -118,34 +125,50 @@ export class Tab1Page {
   }
 
   /**
+   * Attempt to download a study from the URL scanned/entered by a user
+   * @param url The URL to attempt to download a study from
+   */
+  attemptToDownloadStudy(url, isQRCode) {
+    // show loading bar
+    this.loadingService.isCaching = false;
+    this.loadingService.present("Loading...");
+
+    this.surveyDataService.getRemoteData(url).then(data => {
+  
+      // check if the data received from the URL contains JSON properties/modules
+      // in order to determine if it's a schema study before continuing
+      let validStudy = false;
+      try {
+        // checks if the returned text is parseable as JSON, and whether it contains
+        // some of the key fields used by schema so it can determine whether it is
+        // actually a schema study URL
+        validStudy = JSON.parse(data['data']).properties !== undefined
+                  && JSON.parse(data['data']).modules !== undefined
+                  && JSON.parse(data['data']).properties.study_id !== undefined;
+      } catch(e) {
+        validStudy = false;
+      }
+
+      if (validStudy) {
+        this.enrolInStudy(data);
+      } else {
+        this.loadingService.dismiss();
+        this.displayEnrolError(isQRCode);
+      }
+    });  
+  }
+
+  /**
    * Uses the barcode scanner to enrol in a study
    */
   async scanBarcode() {
     this.barcodeScanner.scan().then(barcodeData => {
       if (!barcodeData.cancelled) {
-        // show loading bar
-        this.loadingService.present();
-
-        // attempt to download the study protocol from the URL
-        this.surveyDataService.getRemoteData(barcodeData.text).then(data => {
-
-          // check if the data received from the URL contains JSON properties/modules
-          // in order to determine if it's a schema study before continuing
-          let validStudy = JSON.parse(data['_body']).properties !== undefined
-            && JSON.parse(data['_body']).modules !== undefined;
-
-          if (validStudy) {
-            this.enrolInStudy(data);
-          } else {
-            // hide loading bar
-            this.loadingService.dismiss();
-
-            this.displayEnrolError(true);
-          }
-        });
+        this.attemptToDownloadStudy(barcodeData.text, true);
       } 
      }).catch(err => {
-         console.log('Error', err);
+        this.loadingService.dismiss();
+        this.displayBarcodeError();
      });
   }
 
@@ -158,8 +181,9 @@ export class Tab1Page {
         inputs: [
           {
             name: 'url',
-            type: 'text',
-            placeholder: 'e.g. https://getschema.app/study'
+            type: 'url',
+            placeholder: 'e.g. http://bit.ly/2Q4O9jI',
+            value: 'https://'
           }
         ],
         buttons: [
@@ -170,24 +194,7 @@ export class Tab1Page {
           }, {
             text: 'Enrol',
             handler: response => {
-              // show loading bar
-              this.loadingService.present();
-
-              this.surveyDataService.getRemoteData(response.url).then(data => {
-                
-                // check if the data received from the URL contains JSON properties/modules
-                // in order to determine if it's a schema study before continuing
-                let validStudy = JSON.parse(data['_body']).properties !== undefined
-                                && JSON.parse(data['_body']).modules !== undefined;
-
-                if (validStudy) {
-                  this.enrolInStudy(data);
-                } else {
-                  this.loadingService.dismiss();
-                  this.displayEnrolError(false);
-                }
-
-              });
+              this.attemptToDownloadStudy(response.url, false);
             }
           }
         ]
@@ -206,18 +213,29 @@ export class Tab1Page {
     this.hideEnrolOptions = true;
 
     // convert received data to JSON object
-    this.study = JSON.parse(data['_body']);
+    this.study = JSON.parse(data['data']);
 
     // set an enrolled flag and save the JSON for the current study
-    this.storage.set('current-study', JSON.stringify(this.study));
+    this.storage.set('current-study', JSON.stringify(this.study)).then(() => {
+      // cache all media files if this study 
+      // has set this property to true
+      if (this.study.properties.cache === true) {
 
-    // setup the study task objects
-    this.studyTasksService.generateStudyTasks(this.study);
+        this.loadingService.dismiss().then(() => {
+          this.loadingService.isCaching = true;
+          this.loadingService.present("Downloading media for offline use - please wait!");
+        });
+        this.surveyCacheService.cacheAllMedia(this.study);
+      }
 
-    // setup the notifications
-    this.notificationsService.setNext30Notifications();
-              
-    this.loadStudyDetails();
+      // setup the study task objects
+      this.studyTasksService.generateStudyTasks(this.study);
+
+      // setup the notifications
+      this.notificationsService.setNext30Notifications();
+                
+      this.loadStudyDetails();
+    });
   }
 
   /**
@@ -234,9 +252,15 @@ export class Tab1Page {
 
       // show the study tasks
       this.isEnrolledInStudy = true;
+      this.hideEnrolOptions = true;
 
-      // hide loading bar
-      this.loadingService.dismiss();
+      // reverse the order of the tasks list to show oldest first
+      this.sortTasksList();
+
+      // hide loading controller if not caching
+      if (!this.loadingService.isCaching) {
+        this.loadingService.dismiss();
+      }
     });
   }
 
@@ -245,9 +269,22 @@ export class Tab1Page {
    * @param isQRCode Denotes whether the error was caused via QR code enrolment
    */
   async displayEnrolError(isQRCode) {
-    let msg = isQRCode ? "The QR code you scanned is not a valid study." : "The URL you entered is not a valid study.";
+    let msg = isQRCode ? "We couldn't load your study. Please check your internet connection and ensure you are scanning the correct code." : "We couldn't load your study. Please check your internet connection and ensure you are entering the correct URL.";
     const alert = await this.alertController.create({
-      header: 'Error',
+      header: 'Oops...',
+      message: msg,
+      buttons: ['Dismiss']
+    });
+    await alert.present();
+  }
+
+  /**
+   * Displays a message when camera permission is not allowed
+   */
+  async displayBarcodeError() {
+    let msg = "Camera permission is required to scan QR codes. You can allow this permission in Settings.";
+    const alert = await this.alertController.create({
+      header: 'Permission Required',
       message: msg,
       buttons: ['Dismiss']
     });
@@ -259,6 +296,16 @@ export class Tab1Page {
    */
   sortTasksList() {
     this.task_list.reverse();
+  }
+
+  /**
+   * Refreshes the list of tasks
+   */
+  doRefresh(refresher) {
+    this.ionViewWillEnter();
+    setTimeout(() => {
+      refresher.target.complete();
+    }, 2000);
   }
 
 }

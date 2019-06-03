@@ -9,7 +9,7 @@
 
 <ion-content>
 
-  <ion-item lines="none" *ngIf="!graphs.length > 0">
+  <ion-item lines="none" *ngIf="!(graphs.length > 0)">
     <ion-label text-center text-wrap>
       <br><br>
       <ion-icon id="stats-icon" color="secondary" name="stats"></ion-icon><br><br>
@@ -19,7 +19,7 @@
 
   <div *ngFor="let graph of graphs">
       <ion-item-divider color="light">{{graph.header}}</ion-item-divider>
-      <canvas style="margin-left:10px;margin-right:10px;padding-right:20px;" baseChart 
+      <canvas class="graph-style" baseChart 
         [datasets]="graph.data"
         [labels]="graph.labels"
         [options]="graph.options"
@@ -28,7 +28,7 @@
         [chartType]="graph.type">
       </canvas>
       <ion-item lines="full">
-        <ion-label>
+        <ion-label text-wrap>
           <p style="font-size:13px;">{{graph.blurb}}</p>
         </ion-label>
       </ion-item>

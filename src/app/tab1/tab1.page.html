@@ -7,36 +7,40 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="ic-style page-home" no-padding scroll="false">
+<ion-content class="page-home" no-padding scroll="false">
+  <ion-refresher [hidden]="!hideEnrolOptions" slot="fixed" (ionRefresh)="doRefresh($event)">
+    <ion-refresher-content
+      pullingIcon="arrow-dropdown"
+      refreshingSpinner="crescent"></ion-refresher-content>
+  </ion-refresher>
 
   <!-- Displayed if user is not enrolled in a study -->
   <ion-img src="assets/imgs/slider1.png" [hidden]="hideEnrolOptions" style="height:100%;"></ion-img>
 
   <!-- Displays if user is enrolled in a study -->
-  <div id="study-list" [hidden]="!hideEnrolOptions">
+  <div id="study-list">
 
-    <ion-img [src]="study.properties.banner_url" style="width:100%;"></ion-img>
-    
+    <ion-img *ngIf="study !== null" [hidden]="!hideEnrolOptions" [src]="study.properties.banner_url" style="width:100%;"></ion-img>
 
-    <ion-item-divider color="light">
+    <ion-item-divider color="light" [hidden]="!hideEnrolOptions">
       <strong>Tasks</strong>
         <ion-button (click)="sortTasksList()" fill="clear" slot="end">
           <ion-icon name="swap" slot="icon-only" class="rotate-90"></ion-icon>
         </ion-button>
     </ion-item-divider>
 
-    <ion-item *ngFor="let task of task_list" detail>
+    <ion-item *ngFor="let task of task_list" detail [hidden]="!hideEnrolOptions">
       <ion-icon color="secondary" name="{{task.type}}" slot="start"></ion-icon>
       <ion-label [routerLink]="'/survey/' + task.task_id" routerDirection="forward">
         {{task.name}}
         <br>
-        <span class="moment">{{task.moment}}</span>
+        <span *ngIf="!task.sticky" class="moment">{{task.moment}}</span>
       </ion-label>
     </ion-item>
 
     <ion-item lines="none" text-wrap text-center [hidden]="task_list.length">
-      <ion-label>
-          Relax, you're all up to date!
+      <ion-label *ngIf="study !== null">
+          {{study.properties.empty_msg}}
           <br><br>
           <ion-icon style="font-size:3em;" color="secondary" name="happy"></ion-icon>
       </ion-label>

@@ -17,6 +17,10 @@ import { BarcodeScanner } from '@ionic-native/barcode-scanner/ngx';
 import { LocalNotifications } from '@ionic-native/local-notifications/ngx';
 import { HttpModule } from '@angular/http';
 import { IonicStorageModule } from '@ionic/storage';
+import { HTTP } from '@ionic-native/http/ngx';
+import { FileTransfer } from '@ionic-native/file-transfer/ngx';
+import { File } from '@ionic-native/file/ngx';
+
 
 @NgModule({
   declarations: [AppComponent],
@@ -27,6 +31,9 @@ import { IonicStorageModule } from '@ionic/storage';
     SplashScreen,
     BarcodeScanner,
     LocalNotifications,
+    File,
+    FileTransfer,
+    HTTP,
     FormsModule,
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy }
   ],

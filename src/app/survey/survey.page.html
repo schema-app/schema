@@ -7,7 +7,10 @@
   </ion-toolbar>
   <ion-toolbar>
     <ion-buttons slot="start">
-      <ion-back-button></ion-back-button>
+      <!--<ion-back-button (click)="back()"></ion-back-button>-->
+      <ion-button (click)="back()">
+        <ion-icon slot="icon-only" name="arrow-back"></ion-icon>
+      </ion-button>
     </ion-buttons>
     <ion-title id="section-title">
       {{this.current_section_name}} <small>({{this.current_section}}/{{this.num_sections}})</small>
@@ -19,7 +22,7 @@
 
   <ion-list id="survey-list">
 
-    <ion-item lines="full" text-wrap *ngFor="let question of questions" class="survey-item"
+    <ion-item lines="full" text-wrap *ngFor="let question of survey.sections[current_section-1].questions" class="survey-item"
       [hidden]="!question.hideSwitch">
 
       <!-- instruction type -->
@@ -41,7 +44,7 @@
         </ion-range>
       </div>
 
-      <!-- video/audio type -->
+      <!-- video/audio/image type -->
       <div style="width:100%;padding-right:12px !important;" item-content *ngIf="question.type == 'media'">
         <p [class.showError]="!question.hideError">
           {{question.text}}
@@ -50,11 +53,12 @@
           webkit-playsinline="webkit-playsinline" class="videoPlayer">
           <source [src]="question.src" />
         </video>
+        
         <!-- audio -->
         <audio *ngIf="question.subtype == 'audio'" style="width:100%;" controls="controls" preload="metadata">
           <source [src]="question.src" type="audio/mpeg">
-          Audio not supported
         </audio>
+        
         <!-- image -->
         <ion-img *ngIf="question.subtype == 'image'" style="width:100%;" [src]="question.src"></ion-img>
         <br>
@@ -94,6 +98,7 @@
             <ion-checkbox (click)="changeCheckStatus(option, question)"></ion-checkbox>
           </ion-item>
         </div>
+        <br>
       </div>
 
       <!-- datetimepicker -->
@@ -120,10 +125,10 @@
         </p>
 
         <ion-segment [(ngModel)]="question.model" (ionChange)="setAnswer(question)">
-          <ion-segment-button value="true">
+          <ion-segment-button value="{{question.yes_text}}">
             {{question.yes_text}}
           </ion-segment-button>
-          <ion-segment-button value="false">
+          <ion-segment-button value="{{question.no_text}}">
             {{question.no_text}}
           </ion-segment-button>
           <br><br>

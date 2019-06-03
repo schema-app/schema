@@ -6,6 +6,7 @@
 *.log
 *.tmp
 *.tmp.*
+*.keystore
 log.txt
 *.sublime-project
 *.sublime-workspace
@@ -19,6 +20,7 @@ npm-debug.log*
 .tmp/
 .versions/
 coverage/
+e2e/
 www/
 node_modules/
 tmp/

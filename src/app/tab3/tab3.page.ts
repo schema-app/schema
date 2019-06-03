@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { Storage } from '@ionic/storage';
 import { NavController, AlertController } from '@ionic/angular';
 import { NotificationsService } from '../services/notifications.service';
+import { SurveyCacheService } from '../services/survey-cache.service';
 
 @Component({
   selector: 'app-tab3',
@@ -11,20 +12,21 @@ import { NotificationsService } from '../services/notifications.service';
 export class Tab3Page {
 
   // stores the user's UUID
-  private uuid : String;
+  uuid : String;
 
   // flag to track whether the user is in a study
-  private isEnrolled = false;
+  isEnrolled = false;
 
   // flag to track whether notifications are enabled
-  private notificationsEnabled : boolean = true;
+  notificationsEnabled : boolean = true;
   
   // store a reference to the study object
-  private study;
+  study;
 
   constructor(private storage: Storage,
     private navController: NavController,
     private alertController: AlertController,
+    private surveyCacheService: SurveyCacheService,
     private notificsationsService: NotificationsService) {}
 
   ionViewWillEnter() {
@@ -80,6 +82,8 @@ export class Tab3Page {
               this.storage.remove('study-tasks').then(() => {
                 // cancel all notifications
                 this.notificsationsService.cancelAllNotifications();
+
+                // delete all cached data
 
                 // navigate to the home tab
                 this.navController.navigateRoot('/');

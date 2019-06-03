@@ -16,7 +16,7 @@
     </ion-item>
   </ion-item-group>
   <ion-item-group [hidden]="!isEnrolled">
-    <ion-item-divider color="light">Notifications</ion-item-divider>
+    <ion-item-divider lines="full" color="light">Notifications</ion-item-divider>
     <ion-item lines="full">
       <ion-label> Enable Notifications</ion-label>
       <ion-toggle color="secondary" (ionChange)="toggleNotifications()" [(ngModel)]="notificationsEnabled"></ion-toggle>
@@ -28,7 +28,7 @@
       </ion-label>
     </ion-item>
     <ion-item-divider color="light">Contact</ion-item-divider>
-    <ion-item (click)="openSupportEmail(this.study.properties.support_email, this.study.properties.study_name)" detail>
+    <ion-item lines="full" (click)="openSupportEmail(this.study.properties.support_email, this.study.properties.study_name)" detail>
       <ion-label>
         {{this.study.properties.support_email}}
       </ion-label>

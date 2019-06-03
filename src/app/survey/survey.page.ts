@@ -1,4 +1,5 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
+import { DomSanitizer } from '@angular/platform-browser';
 import { ActivatedRoute } from '@angular/router';
 import { Storage } from '@ionic/storage';
 import { StatusBar } from '@ionic-native/status-bar/ngx';
@@ -16,29 +17,30 @@ export class SurveyPage implements OnInit {
   @ViewChild(IonContent) content: IonContent;
 
   // the text to display as submit button label
-  private submit_text = "Submit";
+  submit_text = "Submit";
 
   // variables to handle the sections
-  private current_section = 1;
-  private num_sections;
-  private current_section_name;
+  current_section = 1;
+  num_sections;
+  current_section_name;
 
   // study object
-  private study;
-  private survey;
-  private questions;
+  study;
+  survey;
+  questions;
 
   // task objects
-  private tasks;
-  private task_id;
-  private task_index;
+  tasks;
+  task_id;
+  task_index;
 
-  constructor(private route : ActivatedRoute,
-    private storage : Storage,
-    private statusBar : StatusBar,
-    private navController : NavController,
+  constructor(private route: ActivatedRoute,
+    private storage: Storage,
+    private statusBar: StatusBar,
+    private domSanitizer: DomSanitizer,
+    private navController: NavController,
     private studyTasksService: StudyTasksService,
-    private toastController : ToastController) { }
+    private toastController: ToastController) { }
 
   /**
    * Triggered when the survey page is first opened
@@ -76,29 +78,101 @@ export class SurveyPage implements OnInit {
 
             // get the correct module
             this.survey = this.study.modules[module_index];
-            
+
+            // shuffle modules if required
+            if (this.survey.shuffle) {
+              this.survey.sections = this.shuffle(this.survey.sections);
+            }
+
+            // shuffle questions if required
+            for (let i = 0; i < this.survey.sections.length; i++) {
+              if (this.survey.sections[i].shuffle) {
+                this.survey.sections[i].questions = this.shuffle(this.survey.sections[i].questions);
+              }
+            }
+
             // get the name of the current section
             this.num_sections = this.survey.sections.length;
-            this.current_section_name = this.survey.sections[this.current_section-1].name;
-  
+            this.current_section_name = this.survey.sections[this.current_section - 1].name;
+
             // initialise all of the questions to be displayed
             this.setupQuestionVariables();
-  
+
             // set the submit text as appropriate
             if (this.current_section < this.num_sections) {
               this.submit_text = "Next";
             } else {
               this.submit_text = this.survey.submit_text;
             }
-  
-            // set the current section of questions
-            this.questions = this.survey.sections[this.current_section-1].questions;
 
+            // set the current section of questions
+            this.questions = this.survey.sections[this.current_section - 1].questions;
+
+            // toggle dynamic question setup and sanitize URLs
+            for (let i = 0; i < this.survey.sections.length; i++) {
+              for (let j = 0; j < this.survey.sections[i].questions.length; j++) {
+                this.toggleDynamicQuestions(this.survey.sections[i].questions[j]);
+              }
+            }
+
+            // toggle rand_group questions
+            // figure out which ones are grouped together, randomly show one and set its response value to 1
+            let randomGroups = {};
+            for (let i = 0; i < this.survey.sections.length; i++) {
+              for (let j = 0; j < this.survey.sections[i].questions.length; j++) {
+                let question = this.survey.sections[i].questions[j];
+                if (question.rand_group !== undefined) {
+                  // set hide switch to false - hide them all by default
+                  question.hideSwitch = false;
+                  // set a flag to indicate that this question shouldn't reappear via branching logic
+                  question.noToggle = true;
+
+                  // categorise questions by rand_group
+                  if (!(question.rand_group in randomGroups)) {
+                    randomGroups[question.rand_group] = [];
+                    randomGroups[question.rand_group].push(question.id);
+                  } else {
+                    randomGroups[question.rand_group].push(question.id);
+                  }
+                }
+              }
+            }
+
+            // from each rand_group, select a random item to show
+            let showThese = [];
+            for (let key in randomGroups) {
+              if (randomGroups.hasOwnProperty(key)) {
+                // select a random value from each array and add it to the "showThese array"
+                showThese.push(randomGroups[key][Math.floor(Math.random() * randomGroups[key].length)]);
+              }
+            }
+
+            // iterate back through and show the ones that have been randomly calculated
+            for (let i = 0; i < this.survey.sections.length; i++) {
+              for (let j = 0; j < this.survey.sections[i].questions.length; j++) {
+                let question = this.survey.sections[i].questions[j];
+                if (showThese.includes(question.id)) {
+                  question.hideSwitch = true;
+                  question.response = 1;
+                }
+              }
+            }
           });
         });
       });
     });
+  }
 
+  /**
+   * Handles the back button behaviour
+   */
+  back() {
+    if (this.current_section > 1) {
+      this.current_section = this.current_section - 1;
+      this.submit_text = "Next";
+    } else {
+      this.navController.navigateRoot('/');
+    }
   }
 
   /**
@@ -115,10 +189,10 @@ export class SurveyPage implements OnInit {
         // for all question types that can be responded to, set default values
         if (question.type !== "media"
           || question.type !== "instruction") {
-            question.response = "";
-            question.model = "";
-            question.hideError = true;
-            question.hideSwitch = true;
+          question.response = "";
+          question.model = "";
+          question.hideError = true;
+          question.hideSwitch = true;
         }
 
         // for datetime questions, default to the current date/time
@@ -126,7 +200,11 @@ export class SurveyPage implements OnInit {
           // placeholder for dates
           question.model = moment().format();
 
-        // for slider questions, set the default value to be halfway between min and max
+          // for audio/video questions, sanitize the URLs to make them safe/work in html5 tags
+        } else if (question.type === "media" && (question.subtype === "audio" || question.subtype === "video")) {
+          question.src = this.domSanitizer.bypassSecurityTrustResourceUrl(question.src);
+
+          // for slider questions, set the default value to be halfway between min and max
         } else if (question.type === "slider") {
           // get min and max
           let min = question.min;
@@ -139,7 +217,7 @@ export class SurveyPage implements OnInit {
           // a starting value must also be set for the slider to work properly
           question.value = model;
 
-        // for checkbox items, the response is set to an empty array
+          // for checkbox items, the response is set to an empty array
         } else if (question.type === 'multi') {
           if (question.radio === "false") {
             question.response = [];
@@ -159,7 +237,10 @@ export class SurveyPage implements OnInit {
     question.hideError = true;
 
     // trigger any branching tied to this question
-    this.toggleDynamicQuestions(question);
+    // as long as its not hidden by rand_group
+    if (question.noToggle !== true) {
+      this.toggleDynamicQuestions(question);
+    }
   }
 
   /**
@@ -193,7 +274,7 @@ export class SurveyPage implements OnInit {
     for (let i = 0; i < responses.length; i++) {
       response_string += responses[i] + ";";
     }
-    
+
     // hide any non-response error
     question.hideError = true;
     question.response = response_string;
@@ -203,7 +284,7 @@ export class SurveyPage implements OnInit {
    * Shows/hides other questions that have branching based on the response to the provided question
    * @param question The question that has been answered
    */
-  toggleDynamicQuestions(question) {
+  toggleDynamicQuestionsOld(question) {
     let id = question.id;
 
     if (question.type === "multi" || question.type === "yesno" || question.type === "text") {
@@ -211,19 +292,20 @@ export class SurveyPage implements OnInit {
       for (let i = 0; i < this.questions.length; i++) {
         if (this.questions[i].hide_id === question.id) {
           let hideValue = this.questions[i].hide_value;
+          //let show = this.questions[i].show;
           if (question.response !== hideValue) {
             this.questions[i].hideSwitch = false;
           } else {
             this.questions[i].hideSwitch = true;
           }
-        } 
+        }
       }
-    // hide anything that is < or > the cutoff value
+      // hide anything that is < or > the cutoff value
     } else if (question.type === "slider") {
       for (let i = 0; i < this.questions.length; i++) {
         if (this.questions[i].hide_id === question.id) {
           let hideValue = this.questions[i].hide_value;
-          let direction = hideValue.substring(0,1);
+          let direction = hideValue.substring(0, 1);
           let cutoff = parseInt(hideValue.substring(1, hideValue.length));
           let lesserThan = true;
           if (direction === ">") lesserThan = false;
@@ -245,19 +327,64 @@ export class SurveyPage implements OnInit {
     }
   }
 
+  toggleDynamicQuestions(question) {
+    let id = question.id;
+    // hide anything with the id as long as the value is equal
+    for (let i = 0; i < this.survey.sections.length; i++) {
+      for (let j = 0; j < this.survey.sections[i].questions.length; j++) {
+        if (this.survey.sections[i].questions[j].hide_id === id) {
+          let hideValue = this.survey.sections[i].questions[j].hide_value;
+
+          if (question.type === "multi" || question.type === "yesno" || question.type === "text") {
+
+            // determine whether to hide/show the element
+            let hideIf = this.survey.sections[i].questions[j].hide_if;
+            let valueEquals = (hideValue === question.response);
+            if (valueEquals === hideIf) {
+              this.survey.sections[i].questions[j].hideSwitch = false;
+            } else {
+              this.survey.sections[i].questions[j].hideSwitch = true;
+            }
+          }
+          else if (question.type === "slider") {
+            let direction = hideValue.substring(0, 1);
+            let cutoff = parseInt(hideValue.substring(1, hideValue.length));
+            let lesserThan = true;
+            if (direction === ">") lesserThan = false;
+            if (lesserThan) {
+              if (question.response <= cutoff) {
+                this.questions[i].hideSwitch = true;
+              } else {
+                this.questions[i].hideSwitch = false;
+              }
+            } else {
+              if (question.response >= cutoff) {
+                this.questions[i].hideSwitch = true;
+              } else {
+                this.questions[i].hideSwitch = false;
+              }
+            }
+          }
+        }
+      }
+    }
+
+  }
+
   /**
    * Triggered whenever the submit button is called
    * Checks if all required questions have been answered and then moves to the next section/saves the response
    */
   submit() {
+
     let errorCount = 0;
     for (let i = 0; i < this.questions.length; i++) {
       let question = this.questions[i];
       if (question.required === true
-          && question.response === ""
-          && question.hideSwitch === true) {
-            question.hideError = false;
-            errorCount++;
+        && question.response === ""
+        && question.hideSwitch === true) {
+        question.hideError = false;
+        errorCount++;
       } else {
         question.hideError = true;
       }
@@ -267,6 +394,9 @@ export class SurveyPage implements OnInit {
 
       // if we are on last page and there are no errors, fine to submit
       if (this.current_section === this.num_sections) {
+
+        // add the alert time to the response
+        this.tasks[this.task_index].alert_time = moment(this.tasks[this.task_index].time).format();
 
         // get a timestamp of submission time
         //let options = { weekday: 'short', day: '2-digit', month: '2-digit', hour: 'numeric', minute: 'numeric' };
@@ -299,8 +429,8 @@ export class SurveyPage implements OnInit {
 
       } else {
         this.current_section++;
-        this.questions = this.survey.sections[this.current_section-1].questions;
-        this.current_section_name = this.survey.sections[this.current_section-1].name;
+        this.questions = this.survey.sections[this.current_section - 1].questions;
+        this.current_section_name = this.survey.sections[this.current_section - 1].name;
 
         if (this.current_section === this.num_sections) {
           this.submit_text = this.survey.submit_text;
@@ -329,8 +459,32 @@ export class SurveyPage implements OnInit {
       keyboardClose: true,
       closeButtonText: "Dismiss"
     });
-  
+
     toast.present();
   }
 
+  /**
+ * Randomly shuffle an array
+ * https://stackoverflow.com/a/2450976/1293256
+ * @param  {Array} array The array to shuffle
+ * @return {String}      The first item in the shuffled array
+ */
+  shuffle(array) {
+
+    let currentIndex = array.length;
+    let temporaryValue, randomIndex;
+
+    // While there remain elements to shuffle...
+    while (0 !== currentIndex) {
+      // Pick a remaining element...
+      randomIndex = Math.floor(Math.random() * currentIndex);
+      currentIndex -= 1;
+
+      // And swap it with the current element.
+      temporaryValue = array[currentIndex];
+      array[currentIndex] = array[randomIndex];
+      array[randomIndex] = temporaryValue;
+    }
+    return array;
+  };
 }

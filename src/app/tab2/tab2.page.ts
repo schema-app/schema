@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { Storage } from '@ionic/storage';
 import { Chart } from 'chart.js';
 import { ChartsModule } from 'ng2-charts';
+import * as moment from 'moment';
 import { StudyTasksService } from '../services/study-tasks.service';
 
 @Component({
@@ -12,10 +13,10 @@ import { StudyTasksService } from '../services/study-tasks.service';
 export class Tab2Page {
 
   // array to store the graphs
-  private graphs = [];
+  graphs = [];
 
   // graph options
-  public chartOptions: any = {
+  chartOptions: any = {
     responsive: true,
     maintainAspectRatio: true,
     scales: {
@@ -35,7 +36,7 @@ export class Tab2Page {
   };
 
   // graph colours
-  public chartColors: Array<any> = [
+  chartColors: Array<any> = [
     { 
       backgroundColor: 'rgba(4,153,139,0.6)',
       borderColor: 'rgba(148,159,177,1)',
@@ -111,7 +112,9 @@ export class Tab2Page {
                         // get the variable we are to graph
                         for (let k in tasks[task].responses) {
                           if (k === variableToGraph) {
-                            task_labels.push(tasks[task].response_time);
+                            // format the response time
+                            let response_time = moment(tasks[task].response_time).format("MMM Do, h:mma");
+                            task_labels.push(response_time);
                             task_data.push(tasks[task].responses[k]);
                             break;
                           }
@@ -121,8 +124,8 @@ export class Tab2Page {
                   }
 
                   // reverse the lists as chart.js adds items RTL
-                  task_labels = task_labels.reverse();
-                  task_data = task_data.reverse();
+                  //task_labels = task_labels.reverse();
+                  //task_data = task_data.reverse();
 
                   // create a new graph object
                   let graphObj = {
