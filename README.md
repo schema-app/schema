@@ -78,8 +78,7 @@ The properties object must define the following attributes:
 | ------ | ------ | ------ | ------ |
 | ```study_id``` | String | An identifier for the study which is sent to the server with response data. | ```"study_id":"ABC123"``` |
 | ```study_name``` | String | The name of the current study. | ```"study_name": "Sleep Study"``` |
-| ```created_by``` | String | The creator of the study, displayed in the app. | ```"created_by": "Psych College"``` |
-| ```description``` | String | A brief description of the study that is displayed in the app. | ```"description": "This study will track your sleep."``` |
+| ```instructions``` | String | Brief description/instructions for the study that is displayed in the app. Basic HTML supported. | ```"instructions": "This study will track your sleep."``` |
 | ```banner_url``` | String | The URL to an image that will be displayed on the home page of your study. It will be displayed at 100% width and maintain the aspect ratio of the original image. | ```"banner_url": "https://getschema.app/banner.png"``` |
 | ```support_email``` | String | An email address that participants can contact for support with the study. | ```"support_email": "support@getschema.app"``` |
 | ```support_url``` | String | A web link to the study's homepage or support information that is linked to in the app. | ```"support_url": "https://getschema.app/"``` |
@@ -113,7 +112,7 @@ The properties of a module object are defined as follows:
 | Property | Type | Description | Example |
 | ------ | ------ | ------ | ------ |
 | ```type``` | String | The type of the module. Accepted values are ```survey```, ```info```, ```video```, and ```audio```. | ```"type": "survey"``` |
-| ```name``` | String | The name of the module. | ```"name": "Daily Checklist"``` |
+| ```name``` | String | The name of the module. Basic HTML supported. | ```"name": "Daily Checklist"``` |
 | ```submit_txt``` | String | The label of the submit button for this module. Note: this value appears only on the final section of a module. | ```"submit_txt": "Finish"``` |
 | ```condition``` | String | The condition that this module belongs to. It must match one of the values from the ```conditions``` array from the study properties, or have the value ```*``` to be scheduled for all participants. | ```"condition":"Control"``` |
 | ```alerts``` | Object | Contains information about the scheduling of this module. Used to control access to the task and set notifications. | See *alerts*. |
@@ -145,7 +144,7 @@ The graphs object must define the following attributes:
 | ```display``` | Boolean | Indicates whether this module displays a feedback graph in the Feedback tab. If the value is ```false```, the remaining variables are ignored. | ```"display": true``` |
 | ```variable``` | String | The ```id``` of a question object to graph. It must match one of the module's question ids. | ```"variable": "q4"``` |
 | ```title``` | String | The title of the graph to be displayed in the Feedback tab. | ```"title": "Daily sleep"``` |
-| ```blurb``` | String | A brief description of the graph to be displayed below it in the feedback tab. | ```"blurb": "Your daily sleep in hours"``` |
+| ```blurb``` | String | A brief description of the graph to be displayed below it in the feedback tab. Basic HTML supported. | ```"blurb": "Your daily sleep in hours"``` |
 | ```type``` | String | The type of graph. Currently ```bar``` and ```line``` are supported. | ```"type": "line"``` | 
 | ```max_points``` | Integer | The maximum number of data points to display in the graph, e.g. ```10``` will only show the ten most recent responses. | ```"max_points": 10``` | 
 
@@ -184,7 +183,7 @@ All question objects must include the following properties:
 | ------ | ------ | ------ | ------ |
 | ```id``` | String | A unique id to identify this question. This id is sent to the server along with any response value. Note: Every element in the entire study protocol must have a unique ```id``` for some features to function correctly.  | ```"id": "q1"``` |
 | ```type``` | String | The primary type of this question. Accepted values are ```instruction```, ```datetime```, ```multi```, ```text```, ```slider```, ```video```, ```audio```, and ```yesno```. | ```"type": "slider"``` |
-| ```text``` | String | The label displayed alongside the question. | ```"text": "How do you feel?"``` |
+| ```text``` | String | The label displayed alongside the question. Basic HTML supported. | ```"text": "How do you feel?"``` |
 | ```required``` | Boolean | Denotes whether this question is required to be answered. The app will force the participant to answer all required questions that are not hidden by branching. | ```"required": true``` | 
 
 Many question types have additional properties that they must include, which are outlined in the following sections.
@@ -228,6 +227,7 @@ Multiple choice questions must have the following additional properties:
 | ------ | ------ | ------ | ------ |
 | ```radio``` | Boolean | Denotes whether the multiple choice should be radio buttons (one selection only) or checkboxes (multiple selections allowed). | ```"radio": true``` |
 | ```options``` | Array | The list of choices to display. | ```"options": [ "Dog", "Cat", "Fish" ]``` |
+| ```shuffle``` | Boolean | If ```true```, the order of the choices will be randomly shuffled. | ```"shuffle": true``` |
 
 ##### Media
 Media questions must have the following additional properties:
@@ -236,6 +236,7 @@ Media questions must have the following additional properties:
 | ------ | ------ | ------ | ------ |
 | ```subtype``` | String | The type of media. Accepted values are ```video```, ```audio```, and ```image```. | ```"subtype": "video"``` | 
 | ```src``` | String | A direct URL to the media source. | ```"src": "https://getschema.app/video.mp4"``` |
+| ```thumb``` | String | Required for ```video``` elements. A direct URL to the placeholder image that is displayed in the video player while loading. | ```"thumb": "https://getschema.app/thumbnail.png"``` |
 
 #### Branching
 To use branching, you need to add two additional properties to the question object that is to be dynamically shown/hidden.
