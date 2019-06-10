@@ -74,4 +74,21 @@
   --ion-color-light-contrast-rgb: 0, 0, 0;
   --ion-color-light-shade: #d7d8da;
   --ion-color-light-tint: #f5f6f9;
+
+  /** tab bar **/
+  ion-tab-bar {
+    --ion-background-color: #0F2042 !important;
+    --color:white;
+  }
+
+  --ion-tab-bar-color-activated: #04998b !important;
+
+  ion-content {
+    --offset-top: 1px !important;
+  }
+
+  /*ion-tab-button[aria-selected=true] {
+    color: #04998b !important;
+  }*/
+  
 }

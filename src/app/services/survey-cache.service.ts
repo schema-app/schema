@@ -3,7 +3,6 @@ import { FileTransfer, FileTransferObject } from '@ionic-native/file-transfer/ng
 import { LoadingService } from '../services/loading-service.service';
 import { File } from '@ionic-native/file/ngx';
 import { Storage } from '@ionic/storage';
-import { LoadingController } from '@ionic/angular';
 
 @Injectable({
   providedIn: 'root'
@@ -13,7 +12,9 @@ export class SurveyCacheService {
   win: any = window;
 
   mediaToCache = {};
+  videoThumbnailsToCache = {};
   localMediaURLs = {};
+  localThumbnailURLs = {};
   mediaCount = 0;
   mediaDownloadedCount = 0;
 
@@ -35,7 +36,7 @@ export class SurveyCacheService {
     let fileName = urlSplit[urlSplit.length - 1];
 
     return transfer.download(url, this.file.dataDirectory + fileName).then((entry) => {
-      return entry.toURL(); // <!------- <--------- trying this as an alternative!
+      return entry.toURL(); 
     }, (error) => {
       // handle error
       return "";
@@ -122,6 +123,7 @@ export class SurveyCacheService {
               let question = studyObject.modules[i].sections[j].questions[k];
               if (question.id in this.localMediaURLs) {
                 question.src = this.localMediaURLs[question.id];
+                if (question.subtype === "video") question.thumb = this.localMediaURLs["banner"];
               }
             }
           }

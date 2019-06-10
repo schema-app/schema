@@ -48,9 +48,9 @@ export class StudyTasksService {
         let alert_title = mod.alerts.title;
         let alert_message = mod.alerts.message;
         let module_type;
-        if (mod.type === "survey") module_type = "checkbox";
-        if (mod.type === "video") module_type = "logo-youtube";
-        if (mod.type === "audio") module_type = "headset";
+        if (mod.type === "survey") module_type = "checkmark";
+        if (mod.type === "video") module_type = "play";
+        if (mod.type === "audio") module_type = "musical-notes";
         if (mod.type === "info") module_type = "bulb";
 
         let module_name = studyObject.modules[i].name;

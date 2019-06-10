@@ -1,10 +1,10 @@
-[![schema](https://ashatte.io/img/schema.png)](https://ashatte.io/schema/)
+[![schema](https://getschema.app/img/schema_banner.jpg)](https://ashatte.io/schema/)
 
 # schema
 
 [![GooglePlay](https://ashatte.io/img/google-play-badge-300x89.png)](https://ashatte.io/) [![AppStore](https://ashatte.io/img/download-on-the-app-store.png)](https://ashatte.io)
 
-schema is a cross-platform mobile application for deploying ecological momentary assessment and intervention studies.
+schema is a cross-platform mobile application for deploying mHealth monitoring and intervention studies.
 
 It supports:
 
@@ -182,7 +182,7 @@ All question objects must include the following properties:
 
 | Property | Type | Description | Example |
 | ------ | ------ | ------ | ------ |
-| ```id``` | String | A unique id to identify this question. This id is sent to the server along with any response value. | ```"id": "q1"``` |
+| ```id``` | String | A unique id to identify this question. This id is sent to the server along with any response value. Note: Every element in the entire study protocol must have a unique ```id``` for some features to function correctly.  | ```"id": "q1"``` |
 | ```type``` | String | The primary type of this question. Accepted values are ```instruction```, ```datetime```, ```multi```, ```text```, ```slider```, ```video```, ```audio```, and ```yesno```. | ```"type": "slider"``` |
 | ```text``` | String | The label displayed alongside the question. | ```"text": "How do you feel?"``` |
 | ```required``` | Boolean | Denotes whether this question is required to be answered. The app will force the participant to answer all required questions that are not hidden by branching. | ```"required": true``` | 

@@ -108,13 +108,6 @@ export class SurveyPage implements OnInit {
             // set the current section of questions
             this.questions = this.survey.sections[this.current_section - 1].questions;
 
-            // toggle dynamic question setup and sanitize URLs
-            for (let i = 0; i < this.survey.sections.length; i++) {
-              for (let j = 0; j < this.survey.sections[i].questions.length; j++) {
-                this.toggleDynamicQuestions(this.survey.sections[i].questions[j]);
-              }
-            }
-
             // toggle rand_group questions
             // figure out which ones are grouped together, randomly show one and set its response value to 1
             let randomGroups = {};
@@ -122,8 +115,7 @@ export class SurveyPage implements OnInit {
               for (let j = 0; j < this.survey.sections[i].questions.length; j++) {
                 let question = this.survey.sections[i].questions[j];
                 if (question.rand_group !== undefined) {
-                  // set hide switch to false - hide them all by default
-                  question.hideSwitch = false;
+
                   // set a flag to indicate that this question shouldn't reappear via branching logic
                   question.noToggle = true;
 
@@ -148,13 +140,28 @@ export class SurveyPage implements OnInit {
             }
 
             // iterate back through and show the ones that have been randomly calculated
+            // while removing the branching attributes from those that are hidden
             for (let i = 0; i < this.survey.sections.length; i++) {
               for (let j = 0; j < this.survey.sections[i].questions.length; j++) {
                 let question = this.survey.sections[i].questions[j];
                 if (showThese.includes(question.id)) {
-                  question.hideSwitch = true;
+                  question.noToggle = false;
                   question.response = 1;
+                // hide any questions from the rand_group that were not made visible
+                // and remove any branching logic attributes
+                } else if (question.noToggle) {
+                  question.hideSwitch = false;
+                  delete question.hide_id;
+                  delete question.hide_value;
+                  delete question.hide_if;
                 }
+              }
+            }
+
+            // toggle dynamic question setup 
+            for (let i = 0; i < this.survey.sections.length; i++) {
+              for (let j = 0; j < this.survey.sections[i].questions.length; j++) {
+                this.toggleDynamicQuestions(this.survey.sections[i].questions[j]);
               }
             }
           });
@@ -187,13 +194,13 @@ export class SurveyPage implements OnInit {
         let question = this.survey.sections[i].questions[j];
 
         // for all question types that can be responded to, set default values
-        if (question.type !== "media"
-          || question.type !== "instruction") {
-          question.response = "";
-          question.model = "";
-          question.hideError = true;
-          question.hideSwitch = true;
-        }
+        //if (question.type !== "media"
+        //  || question.type !== "instruction") {
+        question.response = "";
+        question.model = "";
+        question.hideError = true;
+        question.hideSwitch = true;
+        //}
 
         // for datetime questions, default to the current date/time
         if (question.type === "datetime") {
@@ -203,7 +210,7 @@ export class SurveyPage implements OnInit {
           // for audio/video questions, sanitize the URLs to make them safe/work in html5 tags
         } else if (question.type === "media" && (question.subtype === "audio" || question.subtype === "video")) {
           question.src = this.domSanitizer.bypassSecurityTrustResourceUrl(question.src);
-
+          if (question.subtype === "video") question.thumb = this.domSanitizer.bypassSecurityTrustResourceUrl(question.thumb);
           // for slider questions, set the default value to be halfway between min and max
         } else if (question.type === "slider") {
           // get min and max
@@ -219,6 +226,13 @@ export class SurveyPage implements OnInit {
 
           // for checkbox items, the response is set to an empty array
         } else if (question.type === 'multi') {
+
+          // counterbalance the choices if necessary
+          if (question.shuffle) {
+            question.options = this.shuffle(question.options);
+          }
+
+          // set the empty response to an array for checkbox questions
           if (question.radio === "false") {
             question.response = [];
           }
@@ -237,10 +251,8 @@ export class SurveyPage implements OnInit {
     question.hideError = true;
 
     // trigger any branching tied to this question
-    // as long as its not hidden by rand_group
-    if (question.noToggle !== true) {
-      this.toggleDynamicQuestions(question);
-    }
+    this.toggleDynamicQuestions(question);
+    
   }
 
   /**
@@ -280,54 +292,13 @@ export class SurveyPage implements OnInit {
     question.response = response_string;
   }
 
-  /**
-   * Shows/hides other questions that have branching based on the response to the provided question
-   * @param question The question that has been answered
-   */
-  toggleDynamicQuestionsOld(question) {
-    let id = question.id;
-
-    if (question.type === "multi" || question.type === "yesno" || question.type === "text") {
-      // hide anything with the id as long as the value is equal
-      for (let i = 0; i < this.questions.length; i++) {
-        if (this.questions[i].hide_id === question.id) {
-          let hideValue = this.questions[i].hide_value;
-          //let show = this.questions[i].show;
-          if (question.response !== hideValue) {
-            this.questions[i].hideSwitch = false;
-          } else {
-            this.questions[i].hideSwitch = true;
-          }
-        }
-      }
-      // hide anything that is < or > the cutoff value
-    } else if (question.type === "slider") {
-      for (let i = 0; i < this.questions.length; i++) {
-        if (this.questions[i].hide_id === question.id) {
-          let hideValue = this.questions[i].hide_value;
-          let direction = hideValue.substring(0, 1);
-          let cutoff = parseInt(hideValue.substring(1, hideValue.length));
-          let lesserThan = true;
-          if (direction === ">") lesserThan = false;
-          if (lesserThan) {
-            if (question.response <= cutoff) {
-              this.questions[i].hideSwitch = true;
-            } else {
-              this.questions[i].hideSwitch = false;
-            }
-          } else {
-            if (question.response >= cutoff) {
-              this.questions[i].hideSwitch = true;
-            } else {
-              this.questions[i].hideSwitch = false;
-            }
-          }
-        }
-      }
-    }
-  }
-
   toggleDynamicQuestions(question) {
+    // if a question was hidden by rand_group
+    // don't do any branching
+    if (question.noToggle !== undefined && question.noToggle) {
+      return;
+    } 
+
     let id = question.id;
     // hide anything with the id as long as the value is equal
     for (let i = 0; i < this.survey.sections.length; i++) {

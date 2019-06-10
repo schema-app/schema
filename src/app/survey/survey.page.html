@@ -13,30 +13,30 @@
       </ion-button>
     </ion-buttons>
     <ion-title id="section-title">
-      {{this.current_section_name}} <small>({{this.current_section}}/{{this.num_sections}})</small>
+      <strong>{{this.current_section_name}}</strong> 
     </ion-title>
+    <div style="padding-right:10px;" slot="end">
+      {{this.current_section}}/{{this.num_sections}}
+    </div>
   </ion-toolbar>
 </ion-header>
 
 <ion-content class="scroll-content">
 
-  <ion-list id="survey-list">
+  <div id="survey-list">
 
     <ion-item lines="full" text-wrap *ngFor="let question of survey.sections[current_section-1].questions" class="survey-item"
       [hidden]="!question.hideSwitch">
 
       <!-- instruction type -->
       <div item-content *ngIf="question.type == 'instruction'">
-        <p [class.showError]="!question.hideError">
-          {{question.text}}
-        </p>
+        <p [class.showError]="!question.hideError" [innerHTML]="question.text"></p>
       </div>
 
       <!-- slider type -->
       <div style="width:100%" item-content *ngIf="question.type == 'slider'">
-        <p [class.showError]="!question.hideError">
-          {{question.text}}
-        </p>
+        <p [class.showError]="!question.hideError" [innerHTML]="question.text"></p>
+
         <ion-range [min]="question.min" [max]="question.max" [(ngModel)]="question.model" [pin]="true"
           [value]="question.model" (ionChange)="setAnswer(question)" color="secondary" style="font-size:small;">
           <ion-label slot="start" style="font-size:small;">{{question.hint_left}}</ion-label>
@@ -45,12 +45,10 @@
       </div>
 
       <!-- video/audio/image type -->
-      <div style="width:100%;padding-right:12px !important;" item-content *ngIf="question.type == 'media'">
-        <p [class.showError]="!question.hideError">
-          {{question.text}}
-        </p>
-        <video *ngIf="question.subtype == 'video'" controls="controls" preload="metadata"
-          webkit-playsinline="webkit-playsinline" class="videoPlayer">
+      <div style="width:100%;padding-right:6px !important;" item-content *ngIf="question.type == 'media'">
+        <p *ngIf="question.text" [class.showError]="!question.hideError" [innerHTML]="question.text"></p>
+
+        <video *ngIf="question.subtype == 'video'" controls="controls" [poster]="question.thumb" preload="metadata" webkit-playsinline="webkit-playsinline" class="videoPlayer">
           <source [src]="question.src" />
         </video>
         
@@ -61,14 +59,13 @@
         
         <!-- image -->
         <ion-img *ngIf="question.subtype == 'image'" style="width:100%;" [src]="question.src"></ion-img>
-        <br>
+        
       </div>
 
       <!-- text input -->
       <div style="width:100%;" item-content *ngIf="question.type == 'text'">
-        <p [class.showError]="!question.hideError">
-          {{question.text}}
-        </p>
+        <p [class.showError]="!question.hideError" [innerHTML]="question.text"></p>
+
         <ion-input *ngIf="question.subtype == 'short'" [(ngModel)]="question.model" (ionBlur)="setAnswer(question)"
           style="font-size:small;" type="text" autocomplete="on" autocorrect="on" placeholder="Enter response...">
         </ion-input>
@@ -82,9 +79,8 @@
 
       <!-- multi -->
       <div style="width:100%;" item-content *ngIf="question.type == 'multi'">
-        <p [class.showError]="!question.hideError">
-          {{question.text}}
-        </p>
+        <p [class.showError]="!question.hideError" [innerHTML]="question.text"></p>
+
         <ion-radio-group (ionChange)="setAnswer(question)" [(ngModel)]="question.model" *ngIf="question.radio == true">
           <ion-item *ngFor="let option of question.options">
             <ion-label style="font-size:small;">{{option}}</ion-label>
@@ -103,9 +99,7 @@
 
       <!-- datetimepicker -->
       <div item-content *ngIf="question.type == 'datetime'">
-        <p [class.showError]="!question.hideError">
-          {{question.text}}
-        </p>
+        <p [class.showError]="!question.hideError" [innerHTML]="question.text"></p>
 
         <ion-datetime *ngIf="question.subtype == 'datetime'" style="font-size:small;" [(ngModel)]="question.model"
           displayFormat="DDDD MMM DD, YYYY, hh:mm a" (ionChange)="setAnswer(question)"></ion-datetime>
@@ -120,9 +114,7 @@
 
       <!-- boolean toggle -->
       <div style="width:100%;" item-content *ngIf="question.type == 'yesno'">
-        <p [class.showError]="!question.hideError">
-          {{question.text}}
-        </p>
+        <p [class.showError]="!question.hideError" [innerHTML]="question.text"></p>
 
         <ion-segment [(ngModel)]="question.model" (ionChange)="setAnswer(question)">
           <ion-segment-button value="{{question.yes_text}}">
@@ -145,6 +137,6 @@
         </ion-label>
       </ion-item>
     </ion-item-group>
-  </ion-list>
+  </div>
 
 </ion-content>

@@ -66,12 +66,21 @@ export class SurveyDataService {
               bodyData.append("platform", this.platform.platforms()[0]);
 
               // attempt to submit the data to the server
-              let postSuccess = this.attemptHttpPost(studyJSON.properties.post_url, bodyData);
-              if (postSuccess) {
-                tasks[i].uploaded = true;
-              }
+              //let postSuccess = this.attemptHttpPost(studyJSON.properties.post_url, bodyData);
+              //console.log(postSuccess);
+              //if (postSuccess) {
+              //  tasks[i].uploaded = true;
+              //}
+
+              this.attemptHttpPost(studyJSON.properties.post_url, bodyData).then(success => {
+                if (success) {
+                  tasks[i].uploaded = true;
+                }
+              });
             }
           }
+
+          //console.log(tasks);
 
           // write the tasks back to storage
           this.storage.set('study-tasks', tasks);
@@ -86,17 +95,21 @@ export class SurveyDataService {
    * @param bodyData The data to send to that server
    */
   attemptHttpPost(postURL, bodyData) {
-    return this.http
+    return new Promise(resolve => {
+      this.http
       .post(postURL, bodyData)
       .subscribe(
         data => {
-          if (data.ok) {
-            return true;
+          if (data.status === 200) {
+            resolve(true);
+          } else {
+            resolve(false);
           }
         },
         err => {
-          return false;
+          resolve(false);
         }
       );
+    });
   }
 }

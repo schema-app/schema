@@ -259,7 +259,9 @@ export class Tab1Page {
 
       // hide loading controller if not caching
       if (!this.loadingService.isCaching) {
-        this.loadingService.dismiss();
+        setTimeout(() => {
+          this.loadingService.dismiss();
+        }, 1000);
       }
     });
   }
@@ -305,7 +307,7 @@ export class Tab1Page {
     this.ionViewWillEnter();
     setTimeout(() => {
       refresher.target.complete();
-    }, 2000);
+    }, 250);
   }
 
 }
