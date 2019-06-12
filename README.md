@@ -16,8 +16,10 @@ It supports:
   - Distributed architecture, such that study protocols and data can be stored on your own server.
 
 # Citation
-If you use schema in your own research, please cite the following paper:
-> Shatte, A., & Teague, S. (2019). schema: A distributed mobile platform for deploying ecological momentary assessments and interventions. https://doi.org/xxx
+If you use schema in your own research, please cite the following:
+> Shatte, A., & Teague, S. (2019, June 12). schema: An open-source, distributed mobile platform for deploying mHealth research tools and interventions. Retrieved from osf.io/7vzpm
+
+> Shatte, Adrian, & Teague, Samantha. (2019, June 12). schema (Version 1.0). Zenodo. http://doi.org/10.5281/zenodo.3243918
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.3243918.svg)](https://doi.org/10.5281/zenodo.3243918)
 
