@@ -1,8 +1,8 @@
-[![schema](https://getschema.app/img/schema_banner.jpg)](https://ashatte.io/schema/)
+[![schema](https://getschema.app/img/schema_banner.jpg)](https://getschema.app/)
 
 # schema
 
-[![GooglePlay](https://ashatte.io/img/google-play-badge-300x89.png)](https://ashatte.io/) [![AppStore](https://ashatte.io/img/download-on-the-app-store.png)](https://ashatte.io)
+[![GooglePlay](https://ashatte.io/img/google-play-badge-300x89.png)](https://play.google.com/store/apps/details?id=app.getschema) [![AppStore](https://ashatte.io/img/download-on-the-app-store.png)](https://apps.apple.com/au/app/schema/id1463316309)
 
 schema is a cross-platform mobile application for deploying mHealth monitoring and intervention studies.
 
@@ -273,6 +273,11 @@ The ```post_url``` defined in the study protocol's properties object should poin
 ### Distribution
 Participants can sign up to your study by scanning a QR code or entering a URL. Upload your JSON study protocol to a web server and distribute the link. We recommend using a service like [QRCode Monkey](https://www.qrcode-monkey.com/) to generate a QR code that points to your study protocol link. The URL can be shortened for distribution using [Bitly](https://bitly.com/).
 
+# Testing your program
+The variability in devices that support mHealth apps and the diversity of possible research designs within schema may result in unintended bugs. Therefore it is important that you conduct thorough testing of any program you deploy to schema before sharing it with participants. 
+
+## Feedback
+Please post any bugs, issues or suggested features in the Issues tab.
 
 License
 ----
