@@ -19,6 +19,8 @@ It supports:
 If you use schema in your own research, please cite the following paper:
 > Shatte, A., & Teague, S. (2019). schema: A distributed mobile platform for deploying ecological momentary assessments and interventions. https://doi.org/xxx
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.3243918.svg)](https://doi.org/10.5281/zenodo.3243918)
+
 # Usage
 
 ## Dependencies
