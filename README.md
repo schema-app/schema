@@ -230,6 +230,7 @@ Multiple choice questions must have the following additional properties:
 | Property | Type | Description | Example |
 | ------ | ------ | ------ | ------ |
 | ```radio``` | Boolean | Denotes whether the multiple choice should be radio buttons (one selection only) or checkboxes (multiple selections allowed). | ```"radio": true``` |
+| ```modal``` | Boolean | Denotes whether the selections should appear in a modal popup (good for longer lists) | ```"modal": false``` |
 | ```options``` | Array | The list of choices to display. | ```"options": [ "Dog", "Cat", "Fish" ]``` |
 | ```shuffle``` | Boolean | If ```true```, the order of the choices will be randomly shuffled. | ```"shuffle": true``` |
 
