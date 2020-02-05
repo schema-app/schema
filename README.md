@@ -122,6 +122,8 @@ The properties of a module object are defined as follows:
 | ```alerts``` | Object | Contains information about the scheduling of this module. Used to control access to the task and set notifications. | See *alerts*. |
 | ```graph``` | Object | Contains information about the graph relating to this module (if any). Used to render the graph in the Feedback tab. | See *graph*. | 
 | ```sections``` | Array | An array of section objects that contain the questions/elements for this module. | See *sections*. |
+| ```uuid``` | String | A unique identifier for this module. | ```"uuid": "5f8c6ec7-463d-4e51-9ea3-480115bd9f53" ``` |
+| ```unlock_after``` | Array | A list of UUIDs of modules that must be completed before this module will appear on the task list. | ```"unlock_after": [ "b79bc562-1dd2-4c3f-a1ed-6bb359cbfaaa" ] ``` |
 | ```shuffle``` | Boolean | Used for counterbalancing. If ```true```, the order of the sections will be randomised every time the module is accessed. | ```"shuffle": true``` | 
 
 ##### Alerts
@@ -137,6 +139,7 @@ The alerts object must define the following attributes:
 | ```random``` | Boolean | Indicates whether the alert times should be randomised. If true, each value from ```times``` will be set using the value of ```random_interval```. | ```"random": true``` |
 | ```random_interval``` | Integer | The number of minutes before and after that an alert time should be randomised. For example, if the alert is scheduled for 8.30am and the ```random_interval``` is 30, the alert will be scheduled randomly between 8 and 9am. | ```"random_interval": 30``` |
 | ```sticky``` | boolean | Indicates whether the module should remain available in the Tasks list upon response, allowing the user to access this module repeatedly. | ```"sticky": true``` |
+| ```sticky_label``` | String | A title that appears above a sticky module on the home screen. Multiple sticky modules that are set to appear in succession will be grouped under this title. | ```"sticky_label": "Warm up videos"``` |
 | ```timeout``` | Boolean | If ```timeout``` is true, the task will disappear from the list after the number of minutes specified in ```timeout_after``` have elapsed (if the module is not completed before this time). | ```"timeout": true``` |
 | ```timeout_after``` | Integer | The number of minutes after a task is displayed that it will disappear from the list. ```timeout``` must be ```true``` for this to have any effect. | ```"timeout_after": 30``` |
 
@@ -262,21 +265,33 @@ Elements can also be grouped for randomisation, such that every time a module is
 | ```rand_group``` | String | An identifier that groups a set of elements together so that only one will randomly appear every time a module is accessed. Note: To identify which element was visible, it will be given a response value of ```1```. If the element can record a response this value will be replaced with that response. All hidden elements will record no response. | ```"rand_group": "sad_images"``` |
 
 ### Collecting data
-The ```post_url``` defined in the study protocol's properties object should point to an endpoint that can receive POST requests. schema posts the following variables to the server whenever a task is completed:
+The ```post_url``` defined in the study protocol's properties object should point to an endpoint that can receive POST requests. The endpoint should return the boolean value ```true``` if data has been successfully saved - schema will continue submitting each data point to the server until it receives this acknowledgement. 
+
+schema posts the following variables to the server whenever a task is completed:
 
 | POST id | Type | Description |
 | ------ | ------ | ------ | 
 | ```data_type``` | String | Describes whether ```log``` or ```survey_response``` data is being submitted. | 
 | ```study_id``` | String | The identifier of the study taken from the ```study_id``` property of the study protocol. |
 | ```user_id``` | String | The unique id of the user. |
-| ```platform``` | String | The platform the user responded on. Value will be ```iphone```, ```ipad``` or ```android```. |
 | ```module_index``` | Integer | The index of the module in the ```modules``` array (zero-based).  | 
+| ```platform``` | String | The platform the user responded on. Value will be ```iphone```, ```ipad``` or ```android```. |
+
+For ```survey_response``` data, these additional variables are included:
+
+| POST id | Type | Description |
+| ------ | ------ | ------ | 
 | ```module_name``` | String | The name of the module. | 
 | ```responses``` | String | The questions responses for this task, provided as a stringified JSON object. The key is the ```id``` of the question, for example ```{ "q1": 56 , "q2": "No", "q3": "" }```. |
 | ```response_time``` | Timestamp | The timestamp when the module was completed, in the user's local time, e.g. ```2019-05-08T23:16:21+10:00```. |
 | ```alert_time``` | Timestamp | The timestamp when the module was first scheduled to appear, e.g. ```2019-05-08T23:00:21+10:00```. |
 
-The endpoint should return the boolean value ```true``` if data has been successfully saved - schema will continue submitting each data point to the server until it receives this acknowledgement.
+For ```log``` data, these additional variables are included:
+
+| POST id | Type | Description |
+| ------ | ------ | ------ | 
+| ```page``` | String | The page the user visited in the app. Value can be ```home```, ```my-progress```, ```settings```, or ```survey```. If ```survey```, the ```module_index``` variable will differentiate which module was accessed. | 
+| ```timestamp``` | Timestamp | The timestamp when the user visited the page, e.g. ```2019-10-29T16:08:58+11:00```. |
 
 ### Distribution
 Participants can sign up to your study by scanning a QR code or entering a URL. Upload your JSON study protocol to a web server and distribute the link. We recommend using a service like [QRCode Monkey](https://www.qrcode-monkey.com/) to generate a QR code that points to your study protocol link. The URL can be shortened for distribution using [Bitly](https://bitly.com/).
