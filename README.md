@@ -266,6 +266,7 @@ The ```post_url``` defined in the study protocol's properties object should poin
 
 | POST id | Type | Description |
 | ------ | ------ | ------ | 
+| ```data_type``` | String | Describes whether ```log``` or ```survey_response``` data is being submitted. | 
 | ```study_id``` | String | The identifier of the study taken from the ```study_id``` property of the study protocol. |
 | ```user_id``` | String | The unique id of the user. |
 | ```platform``` | String | The platform the user responded on. Value will be ```iphone```, ```ipad``` or ```android```. |
@@ -274,6 +275,8 @@ The ```post_url``` defined in the study protocol's properties object should poin
 | ```responses``` | String | The questions responses for this task, provided as a stringified JSON object. The key is the ```id``` of the question, for example ```{ "q1": 56 , "q2": "No", "q3": "" }```. |
 | ```response_time``` | Timestamp | The timestamp when the module was completed, in the user's local time, e.g. ```2019-05-08T23:16:21+10:00```. |
 | ```alert_time``` | Timestamp | The timestamp when the module was first scheduled to appear, e.g. ```2019-05-08T23:00:21+10:00```. |
+
+The endpoint should return the boolean value ```true``` if data has been successfully saved - schema will continue submitting each data point to the server until it receives this acknowledgement.
 
 ### Distribution
 Participants can sign up to your study by scanning a QR code or entering a URL. Upload your JSON study protocol to a web server and distribute the link. We recommend using a service like [QRCode Monkey](https://www.qrcode-monkey.com/) to generate a QR code that points to your study protocol link. The URL can be shortened for distribution using [Bitly](https://bitly.com/).
