@@ -262,21 +262,33 @@ Elements can also be grouped for randomisation, such that every time a module is
 | ```rand_group``` | String | An identifier that groups a set of elements together so that only one will randomly appear every time a module is accessed. Note: To identify which element was visible, it will be given a response value of ```1```. If the element can record a response this value will be replaced with that response. All hidden elements will record no response. | ```"rand_group": "sad_images"``` |
 
 ### Collecting data
-The ```post_url``` defined in the study protocol's properties object should point to an endpoint that can receive POST requests. schema posts the following variables to the server whenever a task is completed:
+The ```post_url``` defined in the study protocol's properties object should point to an endpoint that can receive POST requests. The endpoint should return the boolean value ```true``` if data has been successfully saved - schema will continue submitting each data point to the server until it receives this acknowledgement. 
+
+schema posts the following variables to the server whenever a task is completed:
 
 | POST id | Type | Description |
 | ------ | ------ | ------ | 
 | ```data_type``` | String | Describes whether ```log``` or ```survey_response``` data is being submitted. | 
 | ```study_id``` | String | The identifier of the study taken from the ```study_id``` property of the study protocol. |
 | ```user_id``` | String | The unique id of the user. |
-| ```platform``` | String | The platform the user responded on. Value will be ```iphone```, ```ipad``` or ```android```. |
 | ```module_index``` | Integer | The index of the module in the ```modules``` array (zero-based).  | 
+| ```platform``` | String | The platform the user responded on. Value will be ```iphone```, ```ipad``` or ```android```. |
+
+For survey_response data, these additional variables are included:
+
+| POST id | Type | Description |
+| ------ | ------ | ------ | 
 | ```module_name``` | String | The name of the module. | 
 | ```responses``` | String | The questions responses for this task, provided as a stringified JSON object. The key is the ```id``` of the question, for example ```{ "q1": 56 , "q2": "No", "q3": "" }```. |
 | ```response_time``` | Timestamp | The timestamp when the module was completed, in the user's local time, e.g. ```2019-05-08T23:16:21+10:00```. |
 | ```alert_time``` | Timestamp | The timestamp when the module was first scheduled to appear, e.g. ```2019-05-08T23:00:21+10:00```. |
 
-The endpoint should return the boolean value ```true``` if data has been successfully saved - schema will continue submitting each data point to the server until it receives this acknowledgement.
+For log data, these additional variables are included:
+
+| POST id | Type | Description |
+| ------ | ------ | ------ | 
+| ```page``` | String | The page the user visited in the app. Value can be ```home```, ```my-progress```, ```settings```, or ```survey```. If ```survey```, the ```module_index``` variable will differentiate which module was accessed. | 
+| ```timestamp``` | Timestamp | The timestamp when the user visited the page, e.g. ```2019-10-29T16:08:58+11:00```. |
 
 ### Distribution
 Participants can sign up to your study by scanning a QR code or entering a URL. Upload your JSON study protocol to a web server and distribute the link. We recommend using a service like [QRCode Monkey](https://www.qrcode-monkey.com/) to generate a QR code that points to your study protocol link. The URL can be shortened for distribution using [Bitly](https://bitly.com/).
