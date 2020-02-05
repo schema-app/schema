@@ -20,6 +20,7 @@ import { IonicStorageModule } from '@ionic/storage';
 import { HTTP } from '@ionic-native/http/ngx';
 import { FileTransfer } from '@ionic-native/file-transfer/ngx';
 import { File } from '@ionic-native/file/ngx';
+import { InAppBrowser } from '@ionic-native/in-app-browser/ngx';
 
 
 @NgModule({
@@ -31,6 +32,7 @@ import { File } from '@ionic-native/file/ngx';
     SplashScreen,
     BarcodeScanner,
     LocalNotifications,
+    InAppBrowser,
     File,
     FileTransfer,
     HTTP,

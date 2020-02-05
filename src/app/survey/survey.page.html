@@ -25,7 +25,7 @@
 
   <div id="survey-list">
 
-    <ion-item lines="full" text-wrap *ngFor="let question of survey.sections[current_section-1].questions" class="survey-item"
+    <ion-item lines="full" *ngFor="let question of survey.sections[this.current_section-1].questions" class="ion-text-wrap survey-item"
       [hidden]="!question.hideSwitch">
 
       <!-- instruction type -->
@@ -39,21 +39,21 @@
 
         <ion-range [min]="question.min" [max]="question.max" [(ngModel)]="question.model" [pin]="true"
           [value]="question.model" (ionChange)="setAnswer(question)" color="secondary" style="font-size:small;">
-          <ion-label slot="start" style="font-size:small;">{{question.hint_left}}</ion-label>
-          <ion-label slot="end" style="font-size:small;">{{question.hint_right}}</ion-label>
         </ion-range>
+        <p class="slider-label-left">{{question.hint_left}}</p>
+        <p class="slider-label-right">{{question.hint_right}}</p>  
       </div>
 
       <!-- video/audio/image type -->
       <div style="width:100%;padding-right:6px !important;" item-content *ngIf="question.type == 'media'">
         <p *ngIf="question.text" [class.showError]="!question.hideError" [innerHTML]="question.text"></p>
 
-        <video *ngIf="question.subtype == 'video'" controls="controls" [poster]="question.thumb" preload="metadata" webkit-playsinline="webkit-playsinline" class="videoPlayer">
+        <video *ngIf="question.subtype == 'video'" controls="controls" controlsList="nodownload" [poster]="question.thumb" preload="metadata" webkit-playsinline="webkit-playsinline" class="videoPlayer">
           <source [src]="question.src" />
         </video>
         
         <!-- audio -->
-        <audio *ngIf="question.subtype == 'audio'" style="width:100%;" controls="controls" preload="metadata">
+        <audio *ngIf="question.subtype == 'audio'" style="width:100%;" controls="controls" preload="metadata" controlsList="nodownload">
           <source [src]="question.src" type="audio/mpeg">
         </audio>
         
@@ -74,26 +74,42 @@
           style="font-size:small;" placeholder="Enter number..." type="number" pattern="\d*"></ion-input>
 
         <ion-textarea *ngIf="question.subtype == 'long'" [(ngModel)]="question.model" (ionBlur)="setAnswer(question)"
-          style="font-size:small;" placeholder="Enter response..."></ion-textarea>
+          style="font-size:small;" placeholder="Enter response..." auto-grow="true" rows="3"></ion-textarea>
       </div>
 
       <!-- multi -->
       <div style="width:100%;" item-content *ngIf="question.type == 'multi'">
         <p [class.showError]="!question.hideError" [innerHTML]="question.text"></p>
 
-        <ion-radio-group (ionChange)="setAnswer(question)" [(ngModel)]="question.model" *ngIf="question.radio == true">
-          <ion-item *ngFor="let option of question.options">
-            <ion-label style="font-size:small;">{{option}}</ion-label>
-            <ion-radio value="{{option}}"></ion-radio>
+        <div *ngIf="question.modal == true">
+          <ion-item style="width:100%;text-align:left !important;">
+            <ion-label style="display:none;"></ion-label>
+            <ion-select *ngIf="question.radio" style="width:100%;max-width:100%;" (ionChange)="setAnswer(question)" [(ngModel)]="question.model" placeholder="Select..." okText="Select" cancelText="Dismiss">
+              <ion-select-option *ngFor="let option of question.options">{{option}}</ion-select-option>
+            </ion-select>
+            <ion-select *ngIf="!question.radio" style="width:100%;max-width:100%;" (ionChange)="setAnswer(question)" [(ngModel)]="question.model" placeholder="Select..." okText="Select" cancelText="Dismiss" multiple>
+              <ion-select-option *ngFor="let option of question.options">{{option}}</ion-select-option>
+            </ion-select>
           </ion-item>
-        </ion-radio-group>
 
-        <div radio-group [(ngModel)]="question.model" *ngIf="question.radio == false">
-          <ion-item *ngFor="let option of question.options">
-            <ion-label style="font-size:small;">{{option}}</ion-label>
-            <ion-checkbox (click)="changeCheckStatus(option, question)"></ion-checkbox>
-          </ion-item>
         </div>
+
+        <div *ngIf="question.modal == false">
+          <ion-radio-group (ionChange)="setAnswer(question)" [(ngModel)]="question.model" *ngIf="question.radio == true">
+            <ion-item *ngFor="let option of question.options">
+              <ion-label style="font-size:small;" class="ion-text-wrap">{{option}}</ion-label>
+              <ion-radio value="{{option}}"></ion-radio>
+            </ion-item>
+          </ion-radio-group>
+  
+          <div radio-group [(ngModel)]="question.model" *ngIf="question.radio == false">
+            <ion-item *ngFor="let option of question.options">
+              <ion-label style="font-size:small;" class="ion-text-wrap">{{option}}</ion-label>
+              <ion-checkbox (click)="changeCheckStatus(option, question)"></ion-checkbox>
+            </ion-item>
+          </div>
+        </div>
+
         <br>
       </div>
 
@@ -125,6 +141,22 @@
           </ion-segment-button>
           <br><br>
         </ion-segment>
+      </div>
+
+      <!-- external -->
+      <div class="external-container" style="width:100%;" item-content *ngIf="question.type == 'external'">
+        <iframe frameborder="0" scrolling="no" [src]="question.src"></iframe>
+      </div>
+
+      <!-- file -->
+      <div style="width:100%;" item-content *ngIf="question.type == 'file'">
+        <p [class.showError]="!question.hideError" [innerHTML]="question.text"></p>
+
+        <ion-button color="primary" fill="outline" size="large" (click)="openExternalFile(question.src)">
+          <ion-icon slot="start" name="attach"></ion-icon>
+          {{question.file_name}}
+        </ion-button>
+        <br><br>
       </div>
 
     </ion-item>

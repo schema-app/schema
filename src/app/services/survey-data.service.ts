@@ -23,7 +23,7 @@ export class SurveyDataService {
   getRemoteData(surveyURL: string) {
   return new Promise(resolve => {
     this.http2.setRequestTimeout(7);
-    this.http2.get(surveyURL, {}, {}).then(data => {
+    this.http2.post(surveyURL, {seed: 'f2d91e73'}, {}).then(data => {
         resolve(data)
       }).catch(error => {
         resolve(error);
@@ -37,54 +37,76 @@ export class SurveyDataService {
   postDataToServer() {
 
     this.studyTasksService.getAllTasks().then(tasks => {
-      this.storage.get('current-study').then(studyObject => {
-        this.storage.get('uuid').then(uuid => {
+      Promise.all([this.storage.get("current-study"), this.storage.get("uuid"), this.storage.get("logs")]).then(values => {
 
-          let studyJSON = JSON.parse(studyObject);
+        let studyJSON = JSON.parse(values[0]);
+        let uuid = values[1];
 
-          for (let i = 0; i < tasks.length; i++) {
-            if (tasks[i].completed && !tasks[i].uploaded) {
+        // attempt to post all survey responses
+        for (let i = 0; i < tasks.length; i++) {
+          if (tasks[i].completed && !tasks[i].uploaded) {
 
-              // get all questions and their responses
-              let bodyData = new FormData();
+            // get all questions and their responses
+            let bodyData = new FormData();
 
-              // user id
-              bodyData.append("user_id", uuid);
-              // study id (or something)
-              bodyData.append("study_id", studyJSON.properties.study_id);
-              // module index 
-              bodyData.append("module_index", tasks[i].index);
-              // module name
-              bodyData.append("module_name", tasks[i].name);
-              // responses
-              bodyData.append("responses", JSON.stringify(tasks[i].responses));
-              // response time
-              bodyData.append("response_time", tasks[i].response_time);
-              // alert time
-              bodyData.append("alert_time", tasks[i].alert_time);
-              // platform 
-              bodyData.append("platform", this.platform.platforms()[0]);
+            // type of post data
+            bodyData.append("data_type", "survey_response");
+            // user id
+            bodyData.append("user_id", uuid);
+            // study id 
+            bodyData.append("study_id", studyJSON.properties.study_id);
+            // module index 
+            bodyData.append("module_index", tasks[i].index);
+            // module name
+            bodyData.append("module_name", tasks[i].name);
+            // responses
+            bodyData.append("responses", JSON.stringify(tasks[i].responses));
+            // response time
+            bodyData.append("response_time", tasks[i].response_time);
+            // alert time
+            bodyData.append("alert_time", tasks[i].alert_time);
+            // platform 
+            bodyData.append("platform", this.platform.platforms()[0]);
 
-              // attempt to submit the data to the server
-              //let postSuccess = this.attemptHttpPost(studyJSON.properties.post_url, bodyData);
-              //console.log(postSuccess);
-              //if (postSuccess) {
-              //  tasks[i].uploaded = true;
-              //}
-
-              this.attemptHttpPost(studyJSON.properties.post_url, bodyData).then(success => {
-                if (success) {
-                  tasks[i].uploaded = true;
-                }
-              });
-            }
+            this.attemptHttpPost(studyJSON.properties.post_url, bodyData).then(success => {
+              if (success) {
+                tasks[i].uploaded = true;
+                // write the tasks back to storage
+                this.storage.set('study-tasks', tasks);
+              }
+            });
           }
+        }
 
-          //console.log(tasks);
+        // attempt to post all log data
+        let logs = values[2];
 
-          // write the tasks back to storage
-          this.storage.set('study-tasks', tasks);
-        });
+        for (let i = 0; i < logs.length; i++) {
+          if (logs[i].uploaded === false) {
+            let bodyData = new FormData();
+            // type of post_data
+            bodyData.append("data_type", "log");
+            // append user id
+            bodyData.append("user_id", uuid);
+            // study id 
+            bodyData.append("study_id", studyJSON.properties.study_id);
+            // module index
+            bodyData.append("module_index", logs[i].module_index);
+            // page
+            bodyData.append("page", logs[i].page);
+            // timestamp
+            bodyData.append("timestamp", logs[i].timestamp);
+            // platform 
+            bodyData.append("platform", this.platform.platforms()[0]);
+
+            this.attemptHttpPost(studyJSON.properties.post_url, bodyData).then(success => {
+              if (success) {
+                logs[i].uploaded = true;
+                this.storage.set('logs', logs);
+              }
+            });
+          }
+        }
       });
     });
   }

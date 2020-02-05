@@ -55,8 +55,10 @@ export class NotificationsService {
                     var now = new Date();
 
                     if (alertTime > now) {
-                      this.scheduleNotification(task);
-                      alertCount++;
+                      if (this.checkTaskIsUnlocked(task, tasks)) {
+                        this.scheduleNotification(task);
+                        alertCount++;
+                      }
                     }
 
                     // only set 30 alerts into the future
@@ -69,5 +71,33 @@ export class NotificationsService {
         });
       });
     });
+  }
+
+    /**
+   * 
+   * @param task 
+   * @param study_tasks 
+   */
+  checkTaskIsUnlocked(task, study_tasks) {
+
+    // get a set of completed task uuids
+    let completedUUIDs = new Set();
+    for (let i = 0; i < study_tasks.length; i++) {
+      if (study_tasks[i].completed) {
+        completedUUIDs.add(study_tasks[i].uuid);
+      }
+    }
+
+    // get the list of prereqs from the task
+    let prereqs = task.unlock_after;
+    let unlock = true;
+    for (let i = 0; i < prereqs.length; i++) {
+      if (!completedUUIDs.has(prereqs[i])) {
+        unlock = false;
+        break;
+      }
+    }
+
+    return unlock;
   }
 }

@@ -3,6 +3,7 @@ import { Router, NavigationStart } from '@angular/router';
 import { Storage } from '@ionic/storage';
 import { StatusBar } from '@ionic-native/status-bar/ngx';
 import { AlertController } from '@ionic/angular';
+import { Platform } from '@ionic/angular';
 import { BarcodeScanner } from '@ionic-native/barcode-scanner/ngx';
 import { SurveyDataService } from '../services/survey-data.service';
 import { StudyTasksService } from '../services/study-tasks.service';
@@ -40,6 +41,7 @@ export class Tab1Page {
     private studyTasksService : StudyTasksService,
     private uuidService : UuidService,
     private router : Router,
+    private platform : Platform,
     private statusBar : StatusBar,
     private loadingService : LoadingService,
     private alertController : AlertController,
@@ -64,6 +66,11 @@ export class Tab1Page {
         }
       });
 
+      // trigger this to run every time the app is resumed from the background
+      this.platform.resume.subscribe(() => {
+        this.ionViewWillEnter();
+        });
+
       // if entering from a notification, refresh the task list
       this.localNotifications.on('click').subscribe(notification => {
         this.ionViewWillEnter();
@@ -86,11 +93,25 @@ export class Tab1Page {
       localForage.ready(() => {
 
         // check if user is currently enrolled in study
-        this.storage.get('current-study').then((studyObject) => {
+        Promise.all([this.storage.get("current-study"), this.storage.get("logs")]).then(values => {
+
+        //this.storage.get('current-study').then((studyObject) => {
+          let studyObject = values[0];
           if (studyObject !== null) {
 
             // convert the study to a JSON object
             this.study = JSON.parse(studyObject);
+
+            // log the user visiting this tab
+            let logs = values[1];
+            let logEvent = {
+              timestamp: moment().format(),
+              page: 'home',
+              module_index: -1,
+              uploaded: false
+            };
+            logs.push(logEvent);
+            this.storage.set('logs', logs);
 
             // set up next round of notifications
             this.notificationsService.setNext30Notifications();
@@ -159,6 +180,10 @@ export class Tab1Page {
   }
 
   /**
+   * 
+   */
+
+  /**
    * Uses the barcode scanner to enrol in a study
    */
   async scanBarcode() {
@@ -182,7 +207,7 @@ export class Tab1Page {
           {
             name: 'url',
             type: 'url',
-            placeholder: 'e.g. http://bit.ly/2Q4O9jI',
+            placeholder: 'e.g. https://bit.ly/2Q4O9jI',
             value: 'https://'
           }
         ],
@@ -201,7 +226,39 @@ export class Tab1Page {
       });
   
       await alert.present();
-    
+  }
+
+  /**
+   * 
+   * Handles the alert dialog to enrol via Study ID
+   */
+  async enterStudyID() {
+    const alert = await this.alertController.create({
+      header: 'Enter Study ID',
+      inputs: [
+        {
+          name: 'id',
+          type: 'text',
+          placeholder: 'e.g. STUDY01'
+        }
+      ],
+      buttons: [
+        {
+          text: 'Cancel',
+          role: 'cancel',
+          cssClass: 'secondary'
+        }, {
+          text: 'Enrol',
+          handler: response => {
+            // create URL for study
+            let url = "https://getschema.app/study.php?study_id=" + response.id;
+            this.attemptToDownloadStudy(url, false);
+          }
+        }
+      ]
+    });
+
+    await alert.present();
   }
 
   /**
@@ -214,6 +271,12 @@ export class Tab1Page {
 
     // convert received data to JSON object
     this.study = JSON.parse(data['data']);
+
+    // set the enrolled date
+    this.storage.set('enrolment-date', new Date());
+
+    // store an empty array for logging data
+    this.storage.set('logs', []);
 
     // set an enrolled flag and save the JSON for the current study
     this.storage.set('current-study', JSON.stringify(this.study)).then(() => {

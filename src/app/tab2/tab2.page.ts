@@ -15,6 +15,18 @@ export class Tab2Page {
   // array to store the graphs
   graphs = [];
 
+  // array to store the history
+  history = [];
+
+  // flag for study enrolment
+  enrolledInStudy = false;
+
+  // study object JSON
+  studyJSON;
+
+  // current study day
+  studyDay;
+
   // graph options
   chartOptions: any = {
     responsive: true,
@@ -69,26 +81,71 @@ export class Tab2Page {
   ionViewWillEnter() {
 
     this.graphs = [];
+    this.history = [];
+    this.enrolledInStudy = false;
 
     // localForage used as workaround to db readiness issues
     // https://github.com/ionic-team/ionic-storage/issues/168
     this.storage.ready().then((localForage) => {
       localForage.ready(() => {
+        Promise.all([this.storage.get("current-study"), this.storage.get("enrolment-date"), this.storage.get("logs")]).then(values => {
+          let studyObject = values[0];
+          let enrolmentDate = values[1];
+
+        //});
         // check if user is currently enrolled in study
-        this.storage.get('current-study').then((studyObject) => {
+        //this.storage.get('current-study').then((studyObject) => {
           if (studyObject !== null) {
 
-            let studyJSON = JSON.parse(studyObject);
+            this.studyJSON = JSON.parse(studyObject);
+            this.enrolledInStudy = true;
+
+            // calculate the study day
+            this.studyDay = this.diffDays(new Date(enrolmentDate), new Date());
+
+            // log the user visiting this tab
+            let logs = values[2];
+            let logEvent = {
+              timestamp: moment().format(),
+              page: 'my-progress',
+              module_index: -1,
+              uploaded: false
+            };
+            logs.push(logEvent);
+            this.storage.set('logs', logs);
 
             // check if any graphs are available
+            // and add history items
             this.studyTasksService.getAllTasks().then(tasks => {
+              // get all entries for history
+              for (let i = 0; i < tasks.length; i++) {
+                if (tasks[i].completed) {
+                  let historyItem = {
+                    task_name: tasks[i].name.replace(/<\/?[^>]+(>|$)/g, ""),
+                    moment_time: moment(tasks[i].response_time).fromNow(), //format("Do MMM, YYYY").fromNow()
+                    response_time: new Date(tasks[i].response_time)
+                  }
+                  this.history.unshift(historyItem);
+                }
+              }
+              // sort the history array by completion time
+              this.history.sort(function(x, y) {
+                if (x.response_time > y.response_time) {
+                  return -1;
+                }
+                if (x.response_time < y.response_time) {
+                  return 1;
+                }
+                return 0;
+              });
 
-              for (let i = 0; i < studyJSON.modules.length; i++) {
-                let graph = studyJSON.modules[i].graph;
+              // get all graphs
+              for (let i = 0; i < this.studyJSON.modules.length; i++) {
+                let graph = this.studyJSON.modules[i].graph;
 
-                let study_name = studyJSON.modules[i].name;
+                let study_name = this.studyJSON.modules[i].name;
 
-                let graph_header = studyJSON.modules[i].name;
+                let graph_header = this.studyJSON.modules[i].name;
 
                 // if the module is to display a graph
                 if (graph.display) {
@@ -150,5 +207,16 @@ export class Tab2Page {
         });
       });
     });
+  }
+
+  diffDays(d1, d2)
+  {
+    var ndays;
+    var tv1 = d1.valueOf();  // msec since 1970
+    var tv2 = d2.valueOf();
+
+    ndays = (tv2 - tv1) / 1000 / 86400;
+    ndays = Math.round(ndays - 0.5);
+    return ndays;
   }
 }

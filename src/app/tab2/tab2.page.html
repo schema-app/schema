@@ -10,10 +10,10 @@
 <ion-content>
 
   <ion-item lines="none" *ngIf="!(graphs.length > 0)">
-    <ion-label text-center text-wrap>
+    <ion-label class="ion-text-wrap ion-text-center">
       <br><br>
       <ion-icon id="stats-icon" color="secondary" name="stats"></ion-icon><br><br>
-      As you complete tasks, your progress will be updated in this tab.
+      As you complete tasks, your progress will be updated in this tab.<br><br>
     </ion-label>
   </ion-item>
 
@@ -28,11 +28,27 @@
         [chartType]="graph.type">
       </canvas>
       <ion-item lines="full">
-        <ion-label text-wrap>
+        <ion-label class="ion-text-wrap">
           <p style="font-size:13px;color:#000000;" [innerHTML]="graph.blurb"></p>
         </ion-label>
       </ion-item>
-      
     </div>
 
+    <div *ngIf="enrolledInStudy">
+      <ion-item-divider *ngIf="history.length > 0">
+        <ion-label>
+          Recently Completed
+        </ion-label>
+      </ion-item-divider>
+      
+      
+      <ion-item *ngFor="let record of history">
+        <ion-label>
+          {{record.task_name}}
+        </ion-label>
+        <ion-label slot="end" color="medium" class="ion-text-right">
+          {{record.moment_time}}
+        </ion-label>
+      </ion-item>
+    </div>
 </ion-content>

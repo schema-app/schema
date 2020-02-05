@@ -5,6 +5,7 @@ import { Storage } from '@ionic/storage';
 import { StatusBar } from '@ionic-native/status-bar/ngx';
 import { StudyTasksService } from '../services/study-tasks.service';
 import { NavController, IonContent, ToastController } from '@ionic/angular';
+import { InAppBrowser } from '@ionic-native/in-app-browser/ngx';
 import * as moment from 'moment';
 
 @Component({
@@ -26,7 +27,15 @@ export class SurveyPage implements OnInit {
 
   // study object
   study;
-  survey;
+  survey = {
+    sections: [{
+      questions: [],
+      name: "",
+      shuffle: false
+    }],
+    shuffle: false,
+    submit_text: ""
+  };
   questions;
 
   // task objects
@@ -40,7 +49,8 @@ export class SurveyPage implements OnInit {
     private domSanitizer: DomSanitizer,
     private navController: NavController,
     private studyTasksService: StudyTasksService,
-    private toastController: ToastController) { }
+    private toastController: ToastController,
+    private iab: InAppBrowser) { }
 
   /**
    * Triggered when the survey page is first opened
@@ -51,6 +61,14 @@ export class SurveyPage implements OnInit {
     this.statusBar.styleLightContent();
     this.statusBar.backgroundColorByHexString('#0F2042');
 
+    // 
+    window.addEventListener('message', function(e) {
+      if (e.data.hasOwnProperty("frameHeight")) {
+        (<HTMLElement>document.querySelector('iframe[src^="'+e.data.url+'"]')).style.height = `${e.data.frameHeight + 10}px`;
+        (<HTMLElement>document.querySelector('iframe[src^="'+e.data.url+'"]')).style.width = `99%`;
+      }
+    });
+
     // the id of the task to be displayed
     this.task_id = this.route.snapshot.paramMap.get('task_id');
 
@@ -58,7 +76,10 @@ export class SurveyPage implements OnInit {
     // https://github.com/ionic-team/ionic-storage/issues/168
     this.storage.ready().then((localForage) => {
       localForage.ready(() => {
-        this.storage.get('current-study').then((studyObject) => {
+        Promise.all([this.storage.get("current-study"), this.storage.get("uuid"), this.storage.get("logs")]).then(values => {
+
+          let studyObject = values[0];
+          let uuid = values [1];
 
           let module_index;
 
@@ -95,8 +116,9 @@ export class SurveyPage implements OnInit {
             this.num_sections = this.survey.sections.length;
             this.current_section_name = this.survey.sections[this.current_section - 1].name;
 
+            // get the user ID and then set up question variables
             // initialise all of the questions to be displayed
-            this.setupQuestionVariables();
+            this.setupQuestionVariables(uuid);
 
             // set the submit text as appropriate
             if (this.current_section < this.num_sections) {
@@ -164,6 +186,17 @@ export class SurveyPage implements OnInit {
                 this.toggleDynamicQuestions(this.survey.sections[i].questions[j]);
               }
             }
+
+            // log the user visiting this tab
+            let logs = values[2];
+            let logEvent = {
+              timestamp: moment().format(),
+              page: 'survey',
+              module_index: module_index,
+              uploaded: false
+            };
+            logs.push(logEvent);
+            this.storage.set('logs', logs);
           });
         });
       });
@@ -176,6 +209,7 @@ export class SurveyPage implements OnInit {
   back() {
     if (this.current_section > 1) {
       this.current_section = this.current_section - 1;
+      this.current_section_name = this.survey.sections[this.current_section - 1].name;
       this.submit_text = "Next";
     } else {
       this.navController.navigateRoot('/');
@@ -186,7 +220,7 @@ export class SurveyPage implements OnInit {
    * Sets up any questions that need initialisation before display
    * e.g. sets date/time objects to current date/time, set default values for sliders, etc.
    */
-  setupQuestionVariables() {
+  setupQuestionVariables(uuid) {
     // for all relevant questions add an empty response variable
     for (let i = 0; i < this.survey.sections.length; i++) {
       for (let j = 0; j < this.survey.sections[i].questions.length; j++) {
@@ -211,6 +245,12 @@ export class SurveyPage implements OnInit {
         } else if (question.type === "media" && (question.subtype === "audio" || question.subtype === "video")) {
           question.src = this.domSanitizer.bypassSecurityTrustResourceUrl(question.src);
           if (question.subtype === "video") question.thumb = this.domSanitizer.bypassSecurityTrustResourceUrl(question.thumb);
+          
+          // for external embedded content, sanitize the URLs to make them safe/work in html5 tags
+        } else if (question.type === "external") {
+          question.src = question.src + "?uuid=" + uuid;
+          question.src = this.domSanitizer.bypassSecurityTrustResourceUrl(question.src);
+        
           // for slider questions, set the default value to be halfway between min and max
         } else if (question.type === "slider") {
           // get min and max
@@ -236,7 +276,7 @@ export class SurveyPage implements OnInit {
           if (question.radio === "false") {
             question.response = [];
           }
-        }
+        } 
       }
     }
   }
@@ -290,6 +330,15 @@ export class SurveyPage implements OnInit {
     // hide any non-response error
     question.hideError = true;
     question.response = response_string;
+  }
+
+  /**
+   * Opens an external file in the in app browser
+   * @param url The url of the PDF file to open
+   */
+  openExternalFile(url) {
+    //console.log(url);
+    const browser = this.iab.create(url, "_blank", {usewkwebview: "yes"});
   }
 
   toggleDynamicQuestions(question) {
@@ -347,12 +396,11 @@ export class SurveyPage implements OnInit {
    * Checks if all required questions have been answered and then moves to the next section/saves the response
    */
   submit() {
-
     let errorCount = 0;
     for (let i = 0; i < this.questions.length; i++) {
       let question = this.questions[i];
       if (question.required === true
-        && question.response === ""
+        && (question.response === "" || question.response === undefined)
         && question.hideSwitch === true) {
         question.hideError = false;
         errorCount++;

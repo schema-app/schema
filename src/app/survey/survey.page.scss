@@ -20,3 +20,31 @@
  p {
     white-space: pre-wrap;
  }
+
+ .slider-label-left {
+    width:50%;
+    text-align:left;
+    float:left;
+    font-size:small;
+    margin-top:-5px;
+    color:gray;
+ }
+
+ .slider-label-right {
+    width:50%;
+    text-align:right;
+    float:left;
+    font-size:small;
+    margin-top:-5px;
+    color:gray;
+ }
+
+ .external-container {
+    min-height: 100px;
+    background: url("../../assets/imgs/spinner.gif");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 50px 50px;
+    overflow: auto;
+    -webkit-overflow-scrolling:touch;
+ }
