@@ -53,7 +53,7 @@ Install the dependencies and platforms
 $ cd schema
 $ ionic cordova prepare
 ```
-The [Ionic Docs](https://ionicframework.com/docs/installation/cli) contain more detailed instructions.
+The [Ionic Docs](https://ionicframework.com/docs/installation/cli) contain detailed instructions on the next steps.
 
 ## Deploying a study
 To host your own study on the schema platform, the following steps are required:
