@@ -122,6 +122,8 @@ The properties of a module object are defined as follows:
 | ```alerts``` | Object | Contains information about the scheduling of this module. Used to control access to the task and set notifications. | See *alerts*. |
 | ```graph``` | Object | Contains information about the graph relating to this module (if any). Used to render the graph in the Feedback tab. | See *graph*. | 
 | ```sections``` | Array | An array of section objects that contain the questions/elements for this module. | See *sections*. |
+| ```uuid``` | String | A unique identifier for this module. | ```"uuid": "5f8c6ec7-463d-4e51-9ea3-480115bd9f53" ``` |
+| ```unlock_after``` | Array | A list of UUIDs of modules that must be completed before this module will appear on the task list. | ```"unlock_after": [ "b79bc562-1dd2-4c3f-a1ed-6bb359cbfaaa" ] ``` |
 | ```shuffle``` | Boolean | Used for counterbalancing. If ```true```, the order of the sections will be randomised every time the module is accessed. | ```"shuffle": true``` | 
 
 ##### Alerts
@@ -137,6 +139,7 @@ The alerts object must define the following attributes:
 | ```random``` | Boolean | Indicates whether the alert times should be randomised. If true, each value from ```times``` will be set using the value of ```random_interval```. | ```"random": true``` |
 | ```random_interval``` | Integer | The number of minutes before and after that an alert time should be randomised. For example, if the alert is scheduled for 8.30am and the ```random_interval``` is 30, the alert will be scheduled randomly between 8 and 9am. | ```"random_interval": 30``` |
 | ```sticky``` | boolean | Indicates whether the module should remain available in the Tasks list upon response, allowing the user to access this module repeatedly. | ```"sticky": true``` |
+| ```sticky_label``` | String | A title that appears above a sticky module on the home screen. Multiple sticky modules that are set to appear in succession will be grouped under this title. | ```"sticky_label": "Warm up videos"``` |
 | ```timeout``` | Boolean | If ```timeout``` is true, the task will disappear from the list after the number of minutes specified in ```timeout_after``` have elapsed (if the module is not completed before this time). | ```"timeout": true``` |
 | ```timeout_after``` | Integer | The number of minutes after a task is displayed that it will disappear from the list. ```timeout``` must be ```true``` for this to have any effect. | ```"timeout_after": 30``` |
 
@@ -274,7 +277,7 @@ schema posts the following variables to the server whenever a task is completed:
 | ```module_index``` | Integer | The index of the module in the ```modules``` array (zero-based).  | 
 | ```platform``` | String | The platform the user responded on. Value will be ```iphone```, ```ipad``` or ```android```. |
 
-For survey_response data, these additional variables are included:
+For ```survey_response``` data, these additional variables are included:
 
 | POST id | Type | Description |
 | ------ | ------ | ------ | 
@@ -283,7 +286,7 @@ For survey_response data, these additional variables are included:
 | ```response_time``` | Timestamp | The timestamp when the module was completed, in the user's local time, e.g. ```2019-05-08T23:16:21+10:00```. |
 | ```alert_time``` | Timestamp | The timestamp when the module was first scheduled to appear, e.g. ```2019-05-08T23:00:21+10:00```. |
 
-For log data, these additional variables are included:
+For ```log``` data, these additional variables are included:
 
 | POST id | Type | Description |
 | ------ | ------ | ------ | 
