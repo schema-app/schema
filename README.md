@@ -86,8 +86,8 @@ The properties object must define the following attributes:
 | ```banner_url``` | String | The URL to an image that will be displayed on the home page of your study. It will be displayed at 100% width and maintain the aspect ratio of the original image. | ```"banner_url": "https://getschema.app/banner.png"``` |
 | ```support_email``` | String | An email address that participants can contact for support with the study. | ```"support_email": "support@getschema.app"``` |
 | ```support_url``` | String | A web link to the study's homepage or support information that is linked to in the app. | ```"support_url": "https://getschema.app/"``` |
-| ```ethics``` | String | An ethics statement for the study. |
-| ```pls``` | String | A web URL to a PDF file containing the study's Plain Language Statement. |
+| ```ethics``` | String | An ethics statement for the study. | ```"ethics": "This study was approved by ethics committee with approval number 0093423"``` |
+| ```pls``` | String | A web URL to a PDF file containing the study's Plain Language Statement. | ```"pls": "https://getschema.app/pls.pdf"``` |
 | ```empty_msg``` | String | A message displayed to the user when there are no tasks currently available to complete. | ```"empty_msg": "Relax, you're all up to date."``` |
 | ```post_url``` | String | An endpoint to receive participant responses (POST data) from the app. | ```"post_url": "https://getschema.app/post.php"``` |
 | ```conditions``` | Array | A list of conditions that participants can be randomised into. | ```"conditions": [ "Control", "Intervention" ] ``` |
