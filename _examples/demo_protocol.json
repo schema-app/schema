@@ -1,371 +1,221 @@
 {
   "properties": {
-    "study_name": "Demo Study",
-    "study_id": "DEMO01",
-    "instructions": "Any specific information or instructions for your users goes here.",
-    "post_url": "https://your-website/post.php",
-    "empty_msg": "No tasks to complete!",
-    "banner_url": "https://your-website/banner.png",
-    "support_url": "https://your-website/support",
-    "support_email": "support@your-website",
+    "study_name": "Demo",
+    "study_id": "3ZDOGAH",
+    "created_by": "Adrian Shatte",
+    "instructions": "This is a demo study showing the features of schema",
+    "post_url": "https://getschema.app/data-post.php",
+    "empty_msg": "You're all up to date",
+    "banner_url": "https://getschema.app/img/schema_banner.png",
+    "support_url": "https://getschema.app",
+    "support_email": "hello@getschema.app",
     "conditions": [
       "Control",
-      "Intervention"
+      "Treatment"
     ],
-    "cache": false
+    "cache": false,
+    "ethics": "This study was approved by ethics body with approval #123456789",
+    "pls": "https://getschema.app/pls-file-link.pdf"
   },
   "modules": [
     {
       "type": "info",
-      "name": "Welcome to the Study",
-      "submit_text": "Dismiss",
+      "name": "Welcome",
+      "submit_text": "Submit",
       "alerts": {
+        "title": "Welcome to the study",
+        "message": "Tap to open the app",
         "duration": 1,
-        "random": false,
-        "sticky": false,
-        "times": [
-          {
-            "hours": 0,
-            "minutes": 0
-          }
-        ],
-        "start_offset": 0,
-        "random_interval": 30,
-        "timeout": false,
-        "timeout_after": 0,
-        "title": "Welcome to the study!",
-        "message": "Tap to open the app."
-      },
-      "graph": {
-        "display": false
-      },
-      "sections": [
-        {
-          "name": "About the study",
-          "questions": [
-            {
-              "id": "about_q1",
-              "type": "instruction",
-              "text": "<h1>Welcome to the study</h1>You will be asked several questions about your <em>habits</em>.<br><br>You will receive several notifications per day. Please respond as soon as possible."
-            }
-          ],
-          "shuffle": false
-        }
-      ],
-      "condition": "Control",
-      "shuffle": false
-    },
-    {
-      "type": "video",
-      "name": "Week 1: Unwind",
-      "submit_text": "FINISH",
-      "alerts": {
-        "duration": 1,
-        "random": false,
-        "sticky": false,
-        "times": [
-          {
-            "hours": 7,
-            "minutes": 0
-          }
-        ],
-        "start_offset": 0,
-        "random_interval": 30,
-        "timeout": false,
-        "timeout_after": 60000,
-        "title": "Welcome to the study!",
-        "message": "Tap to open the app."
-      },
-      "graph": {
-        "display": false
-      },
-      "sections": [
-        {
-          "name": "Week 1: Unwind",
-          "questions": [
-            {
-              "id": "unwind_q1",
-              "type": "media",
-              "subtype": "image",
-              "src": "https://your-website/unwind/image.png"
-            },
-            {
-              "id": "unwind_q2",
-              "type": "instruction",
-              "text": "<center><h1><strong>Welcome to Week 1: Unwind.</strong></h1></center>Before you begin, please answer the following questions."
-            },
-            {
-              "id": "unwind_q3",
-              "type": "multi",
-              "text": "In the past 24 hours, I have (select all that apply)",
-              "radio": false,
-              "shuffle": true,
-              "options": [
-                "Exercised",
-                "Consumed alcohol",
-                "Experienced a stressful life event"
-              ]
-            }
-          ]
-        },
-        {
-          "name": "Week 1: Unwind",
-          "questions": [
-            {
-              "id": "unwind_q1",
-              "type": "slider",
-              "text": "How tired do you feel at the moment?",
-              "min": 1,
-              "max": 10,
-              "hint_left": "Not at all",
-              "hint_right": "Extremely"
-            },
-            {
-              "id": "unwind_q2",
-              "type": "instruction",
-              "text": "Meditation can be a useful tool to help us unwind. When we settle the mind, we rest the body - and that restfulness is what makes it easier to wind down and drift off."
-            },
-            {
-              "id": "unwind_q3",
-              "type": "media",
-              "subtype": "video",
-              "src": "https://your-website/meditation.mp4",
-              "thumb": "https://your-website/mediation-thumbnail.png",
-              "text": "This short video helps to guide you through a meditation exercise to help send you to sleep."
-            }
-          ],
-          "shuffle": false
-        }
-      ],
-      "condition": "Intervention",
-      "shuffle": false
-    },
-    {
-      "type": "survey",
-      "name": "Sleep Diary",
-      "submit_text": "Done",
-      "alerts": {
-        "duration": 7,
-        "random": true,
-        "sticky": false,
         "times": [
           {
             "hours": 8,
-            "minutes": 0
+            "minutes": 30
           }
         ],
-        "start_offset": 0,
+        "random": true,
         "random_interval": 30,
+        "sticky": true,
+        "sticky_label": "Start here",
         "timeout": false,
-        "timeout_after": 60000,
-        "title": "Complete your sleep diary",
-        "message": "Tap to open the app."
+        "timeout_after": 0,
+        "start_offset": 0
+      },
+      "graph": {
+        "display": false
+      },
+      "sections": [
+        {
+          "name": "Welcome",
+          "questions": [
+            {
+              "id": "instruction-1wnjocfw",
+              "type": "instruction",
+              "text": "Hello! Welcome to the study! This module only shows for those enrolled in the control condition.",
+              "required": false,
+              "hide_id": "",
+              "hide_value": "",
+              "hide_if": true
+            }
+          ],
+          "shuffle": false
+        }
+      ],
+      "shuffle": false,
+      "condition": "Control",
+      "uuid": "3fb09fcd-4fca-4074-a395-34d65ee5a521",
+      "unlock_after": []
+    },
+    {
+      "type": "survey",
+      "name": "Elements",
+      "submit_text": "Submit",
+      "alerts": {
+        "title": "Elements Demo",
+        "message": "Tap to open app",
+        "duration": 5,
+        "times": [
+          {
+            "hours": 9,
+            "minutes": 30
+          },
+          {
+            "hours": 12,
+            "minutes": 30
+          },
+          {
+            "hours": 15,
+            "minutes": 30
+          },
+          {
+            "hours": 18,
+            "minutes": 30
+          }
+        ],
+        "random": true,
+        "random_interval": 30,
+        "sticky": false,
+        "sticky_label": "",
+        "timeout": true,
+        "timeout_after": 30,
+        "start_offset": 1
       },
       "graph": {
         "display": true,
-        "variable": "sleep_q2",
-        "title": "Hours Slept",
-        "blurb": "This graph displays the number of <em>hours</em> you have slept each night.",
+        "title": "Slider Graph",
+        "blurb": "This graph displays the values from the slider element as a bar graph, displaying the past 7 responses.",
+        "variable": "slider-0yih1evt",
         "type": "bar",
         "max_points": 7
       },
       "sections": [
         {
-          "name": "Sleep Diary",
+          "name": "Section 1",
           "questions": [
             {
-              "id": "sleep_q0",
-              "type": "media",
-              "subtype": "image",
-              "src": "https://your-website/image.png"
-            },
-            {
-              "id": "sleep_q1",
+              "id": "instruction-pvke1yey",
               "type": "instruction",
-              "text": "Please answer the following questions about your sleep last night."
+              "text": "This is an instruction type.",
+              "required": false,
+              "hide_id": "",
+              "hide_value": "",
+              "hide_if": true
             },
             {
-              "id": "sleep_q2",
+              "id": "text-71nnpqzi",
               "type": "text",
-              "subtype": "numeric",
+              "text": "This is a text input type.",
               "required": true,
-              "text": "The number of hours I slept last night in total:"
+              "hide_id": "",
+              "hide_value": "",
+              "hide_if": true,
+              "subtype": "short"
             },
             {
-              "id": "sleep_q3",
+              "id": "datetime-79ygddzl",
               "type": "datetime",
-              "subtype": "time",
+              "text": "This is a date input type (date only).",
               "required": true,
-              "text": "I went to bed last night at:"
+              "hide_id": "",
+              "hide_value": "",
+              "hide_if": true,
+              "subtype": "date"
             },
             {
-              "id": "sleep_q4",
-              "type": "datetime",
-              "required": true,
-              "text": "I got out of bed this morning at:",
-              "subtype": "time"
-            },
-            {
-              "id": "sleep_q5",
+              "id": "multi-q8bohlar",
               "type": "multi",
+              "text": "This is a multiple choice type with branching demo.",
+              "required": true,
+              "hide_id": "",
+              "hide_value": "",
+              "hide_if": true,
+              "modal": false,
               "radio": true,
-              "required": true,
-              "text": "Last night I fell asleep:",
+              "shuffle": true,
               "options": [
-                "Easily",
-                "After some time",
-                "With difficuly"
+                "apple",
+                "orange",
+                "banana"
               ]
-            }
-          ]
-        }
-      ],
-      "condition": "*"
-    },
-    {
-      "type": "survey",
-      "name": "Daily wellbeing check",
-      "submit_text": "Finish",
-      "alerts": {
-        "duration": 7,
-        "random": true,
-        "sticky": false,
-        "times": [
-          {
-            "hours": 9,
-            "minutes": 0
-          },
-          {
-            "hours": 17,
-            "minutes": 0
-          }
-        ],
-        "start_offset": 0,
-        "random_interval": 30,
-        "timeout": false,
-        "timeout_after": 60000,
-        "title": "Daily wellbeing check",
-        "message": "Tap to open the app."
-      },
-      "graph": {
-        "display": true,
-        "variable": "wellbeing_q2",
-        "title": "Positive Affect",
-        "blurb": "This graph displays your daily positive affect score.",
-        "type": "line",
-        "max_points": 7
-      },
-      "sections": [
-        {
-          "name": "Wellbeing Check",
-          "questions": [
-            {
-              "id": "wellbeing_img",
-              "type": "media",
-              "subtype": "image",
-              "src": "https://ashatte.io/schema/pics/drema_wellbeing.png"
             },
             {
-              "id": "wellbeing_q1",
+              "id": "instruction-mof4ymv4",
               "type": "instruction",
-              "text": "Please read each of the following statements and indicate how much the statement applied to you over the last week."
-            },
-            {
-              "id": "wellbeing_q2",
-              "type": "slider",
-              "required": true,
-              "text": "I found it hard to wind down.",
-              "min": 1,
-              "max": 10,
-              "hint_left": "Never",
-              "hint_right": "Always"
-            },
-            {
-              "id": "wellbeing_q3",
-              "type": "slider",
-              "required": true,
-              "text": "I couldn't seem to experience any positive feeling at all.",
-              "min": 1,
-              "max": 10,
-              "hint_left": "Never",
-              "hint_right": "Always"
-            },
-            {
-              "id": "wellbeing_q4",
-              "type": "slider",
-              "required": true,
-              "text": "I found it difficult to work up the initiative to do things.",
-              "min": 1,
-              "max": 10,
-              "hint_left": "Never",
-              "hint_right": "Always"
-            },
-            {
-              "id": "wellbeing_q5",
-              "type": "slider",
-              "required": true,
-              "text": "I tended to over-react to situations.",
-              "min": 1,
-              "max": 10,
-              "hint_left": "Never",
-              "hint_right": "Always"
+              "text": "This will only show if the user selects banana from the previous question",
+              "required": false,
+              "hide_id": "multi-q8bohlar",
+              "hide_value": "banana",
+              "hide_if": false
             }
           ],
           "shuffle": false
         },
         {
-          "name": "Wellbeing Check",
+          "name": "Section 2",
           "questions": [
             {
-              "id": "wellbeing_q6",
-              "type": "instruction",
-              "text": "Please read each of the following statements and indicate how much the statement applied to you over the last week."
+              "id": "media-o3p069gi",
+              "type": "media",
+              "text": "This is a media type.",
+              "required": false,
+              "hide_id": "",
+              "hide_value": "",
+              "hide_if": true,
+              "subtype": "image",
+              "src": "https://getschema.app/img/schema_banner.jpg",
+              "thumb": ""
             },
             {
-              "id": "wellbeing_q7",
+              "id": "slider-0yih1evt",
               "type": "slider",
+              "text": "This is a slider type",
               "required": true,
-              "text": "I felt I had enough time to look after myself.",
-              "min": 1,
+              "hide_id": "",
+              "hide_value": "",
+              "hide_if": true,
+              "min": 0,
               "max": 10,
-              "hint_left": "Never",
-              "hint_right": "Always"
+              "hint_left": "less",
+              "hint_right": "more"
             },
             {
-              "id": "wellbeing_q8",
-              "type": "slider",
+              "id": "yesno-mv09ggb1",
+              "type": "yesno",
+              "text": "This is a switch",
               "required": true,
-              "text": "I felt worried or stress.",
-              "min": 1,
-              "max": 10,
-              "hint_left": "Never",
-              "hint_right": "Always"
-            },
-            {
-              "id": "wellbeing_q9",
-              "type": "slider",
-              "required": true,
-              "text": "I felt that I could not sleep.",
-              "min": 1,
-              "max": 10,
-              "hint_left": "Never",
-              "hint_right": "Always"
-            },
-            {
-              "id": "wellbeing_q10",
-              "type": "slider",
-              "required": true,
-              "text": "I felt my heart beating through my chest.",
-              "min": 1,
-              "max": 10,
-              "hint_left": "Never",
-              "hint_right": "Always"
+              "hide_id": "",
+              "hide_value": "",
+              "hide_if": true,
+              "yes_text": "Yes",
+              "no_text": "No"
             }
           ],
           "shuffle": false
         }
       ],
-      "condition": "*"
+      "shuffle": false,
+      "condition": "*",
+      "uuid": "dee87a08-8616-453a-9a6e-9e8f8ea9c942",
+      "unlock_after": []
     }
   ]
 }
