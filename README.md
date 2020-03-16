@@ -307,7 +307,7 @@ The variability in devices that support mHealth apps and the diversity of possib
 ## Feedback
 Please post any bugs, issues or suggested features in the Issues tab.
 
-## Localisation
+# Localisation
 schema uses the [ngx-translate](https://github.com/ngx-translate/core) library for translation. If you wish to contribute a localised version of the app's strings in another language, the file ```src/assets/i18n/en.json``` should be used as a template. Follow the documentation from ngx-translate to determine the correct name for your language file. 
 
 License
