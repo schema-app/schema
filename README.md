@@ -55,6 +55,9 @@ $ ionic cordova prepare
 ```
 The [Ionic Docs](https://ionicframework.com/docs/installation/cli) contain detailed instructions on the next steps.
 
+## Localisation
+schema uses the [ngx-translate](https://github.com/ngx-translate/core) library for translation. If you wish to contribute a localised version of the app's strings in another language, the file ```src/assets/i18n/en.json``` should be used as a template. 
+
 ## Deploying a study
 To host your own study on the schema platform, the following steps are required:
 * Create a study protocol and upload it to a web server (follow the instructions below or try our [web-based builder](https://bldr.getschema.app/))
@@ -303,6 +306,9 @@ The variability in devices that support mHealth apps and the diversity of possib
 
 ## Feedback
 Please post any bugs, issues or suggested features in the Issues tab.
+
+## Localisation
+schema uses the [ngx-translate](https://github.com/ngx-translate/core) library for translation. If you wish to contribute a localised version of the app's strings in another language, the file ```src/assets/i18n/en.json``` should be used as a template. Follow the documentation from ngx-translate to determine the correct name for your language file. 
 
 License
 ----
