@@ -14,6 +14,8 @@ import { NotificationsService } from '../services/notifications.service';
 import { LocalNotifications } from '@ionic-native/local-notifications/ngx';
 import * as moment from 'moment';
 import { _iterableDiffersFactory } from '@angular/core/src/application_module';
+import { TranslateConfigService } from '../translate-config.service';
+import {TranslateService} from '@ngx-translate/core';
 
 @Component({
   selector: 'app-tab1',
@@ -31,8 +33,27 @@ export class Tab1Page {
   // stores the list of tasks to be completed by the user
   task_list = [];
 
+  //translations loaded from the appropriate language file
+  // defaults are provided but will be overridden if language file 
+  // is loaded successfully
+  translations = {
+    "btn_cancel": "Cancel",
+    "btn_dismiss": "Dismiss",
+    "btn_enrol": "Enrol",
+    "btn_enter-url": "Enter URL",
+    "btn_study-id": "Study ID",
+    "error_loading-qr-code": "We couldn't load your study. Please check your internet connection and ensure you are scanning the correct code.",
+    "error_loading-study": "We couldn't load your study. Please check your internet connection and ensure you are entering the correct URL.",
+    "heading_error": "Oops...",
+    "label_loading": "Loading...",
+    "msg_caching": "Downloading media for offline use - please wait!",
+    "msg_camera": "Camera permission is required to scan QR codes. You can allow this permission in Settings."
+  };
   
   safeURL;
+
+  // the current language of the device
+  selectedLanguage;
 
   constructor(private barcodeScanner : BarcodeScanner,
     private surveyDataService : SurveyDataService,
@@ -46,7 +67,11 @@ export class Tab1Page {
     private loadingService : LoadingService,
     private alertController : AlertController,
     private localNotifications : LocalNotifications,
-    private storage : Storage) {
+    private storage : Storage,
+    private translateConfigService: TranslateConfigService,
+    private translate: TranslateService) {
+      // get the default language of the device
+      this.selectedLanguage = this.translateConfigService.getDefaultLanguage();
     }
 
     ngOnInit() {
@@ -78,11 +103,26 @@ export class Tab1Page {
     }
 
   ionViewWillEnter() {
+    // load the correct translations for dynamic labels/messages
+    let labels = [
+      "btn_cancel",
+      "btn_dismiss",
+      "btn_enrol",
+      "btn_enter-url",
+      "btn_study-id",
+      "error_loading-qr-code",
+      "error_loading-study",
+      "heading_error",
+      "label_loading",
+      "msg_caching",
+      "msg_camera"
+    ];
+    this.translate.get(labels).subscribe(res => { this.translations = res; });
 
     this.localNotifications.requestPermission();
 
     this.loadingService.isCaching = false;
-    this.loadingService.present("Loading...");
+    this.loadingService.present(this.translations["label_loading"]);
 
     this.hideEnrolOptions = true;
     this.isEnrolledInStudy = false;
@@ -118,7 +158,7 @@ export class Tab1Page {
 
             // attempt to post any pending data to server
             this.surveyDataService.postDataToServer();
-
+            
             // load the study tasks
             this.loadStudyDetails();
           } else {
@@ -152,7 +192,7 @@ export class Tab1Page {
   attemptToDownloadStudy(url, isQRCode) {
     // show loading bar
     this.loadingService.isCaching = false;
-    this.loadingService.present("Loading...");
+    this.loadingService.present(this.translations["label_loading"]);
 
     this.surveyDataService.getRemoteData(url).then(data => {
   
@@ -202,7 +242,7 @@ export class Tab1Page {
    */
   async enterURL() {
       const alert = await this.alertController.create({
-        header: 'Enter URL',
+        header: this.translations["btn_enter-url"],
         inputs: [
           {
             name: 'url',
@@ -213,11 +253,11 @@ export class Tab1Page {
         ],
         buttons: [
           {
-            text: 'Cancel',
+            text: this.translations["btn_cancel"],
             role: 'cancel',
             cssClass: 'secondary'
           }, {
-            text: 'Enrol',
+            text: this.translations["btn_enrol"],
             handler: response => {
               this.attemptToDownloadStudy(response.url, false);
             }
@@ -234,7 +274,7 @@ export class Tab1Page {
    */
   async enterStudyID() {
     const alert = await this.alertController.create({
-      header: 'Enter Study ID',
+      header: this.translations["btn_study-id"],
       inputs: [
         {
           name: 'id',
@@ -244,11 +284,11 @@ export class Tab1Page {
       ],
       buttons: [
         {
-          text: 'Cancel',
+          text: this.translations["btn_cancel"],
           role: 'cancel',
           cssClass: 'secondary'
         }, {
-          text: 'Enrol',
+          text: this.translations["btn_enrol"],
           handler: response => {
             // create URL for study
             let url = "https://getschema.app/study.php?study_id=" + response.id;
@@ -286,7 +326,7 @@ export class Tab1Page {
 
         this.loadingService.dismiss().then(() => {
           this.loadingService.isCaching = true;
-          this.loadingService.present("Downloading media for offline use - please wait!");
+          this.loadingService.present(this.translations["msg_caching"]);
         });
         this.surveyCacheService.cacheAllMedia(this.study);
       }
@@ -334,11 +374,11 @@ export class Tab1Page {
    * @param isQRCode Denotes whether the error was caused via QR code enrolment
    */
   async displayEnrolError(isQRCode) {
-    let msg = isQRCode ? "We couldn't load your study. Please check your internet connection and ensure you are scanning the correct code." : "We couldn't load your study. Please check your internet connection and ensure you are entering the correct URL.";
+    let msg = isQRCode ? this.translations["error_loading-qr-code"] : this.translations["error_loading-study"];
     const alert = await this.alertController.create({
-      header: 'Oops...',
+      header: this.translations["heading_error"],
       message: msg,
-      buttons: ['Dismiss']
+      buttons: [this.translations["btn_dmismiss"]]
     });
     await alert.present();
   }
@@ -347,11 +387,11 @@ export class Tab1Page {
    * Displays a message when camera permission is not allowed
    */
   async displayBarcodeError() {
-    let msg = "Camera permission is required to scan QR codes. You can allow this permission in Settings.";
+    let msg = this.translations["msg_camera"];
     const alert = await this.alertController.create({
-      header: 'Permission Required',
+      header: this.translations["heading_permission-required"],
       message: msg,
-      buttons: ['Dismiss']
+      buttons: [this.translations["btn_dismiss"]]
     });
     await alert.present();
   }

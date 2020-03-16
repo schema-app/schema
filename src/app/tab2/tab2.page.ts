@@ -4,6 +4,7 @@ import { Chart } from 'chart.js';
 import { ChartsModule } from 'ng2-charts';
 import * as moment from 'moment';
 import { StudyTasksService } from '../services/study-tasks.service';
+import { TranslateConfigService } from '../translate-config.service';
 
 @Component({
   selector: 'app-tab2',
@@ -26,6 +27,9 @@ export class Tab2Page {
 
   // current study day
   studyDay;
+
+  // the current language of the device
+  selectedLanguage;
 
   // graph options
   chartOptions: any = {
@@ -76,7 +80,11 @@ export class Tab2Page {
   ];
 
   constructor(private storage: Storage,
-    private studyTasksService: StudyTasksService) { }
+    private studyTasksService: StudyTasksService,
+    private translateConfigService: TranslateConfigService) { 
+      // get the default language of the device
+      this.selectedLanguage = this.translateConfigService.getDefaultLanguage();
+    }
 
   ionViewWillEnter() {
 

@@ -5,6 +5,7 @@ import { NotificationsService } from '../services/notifications.service';
 import { SurveyCacheService } from '../services/survey-cache.service';
 import { InAppBrowser } from '@ionic-native/in-app-browser/ngx';
 import * as moment from 'moment';
+import { TranslateConfigService } from '../translate-config.service';
 
 @Component({
   selector: 'app-tab3',
@@ -21,6 +22,9 @@ export class Tab3Page {
 
   // flag to track whether notifications are enabled
   notificationsEnabled : boolean = true;
+
+  // the current language of the device
+  selectedLanguage;
   
   // store a reference to the study object
   study = {
@@ -39,7 +43,11 @@ export class Tab3Page {
     private alertController: AlertController,
     private iab: InAppBrowser,
     private surveyCacheService: SurveyCacheService,
-    private notificsationsService: NotificationsService) {}
+    private notificsationsService: NotificationsService,
+    private translateConfigService: TranslateConfigService) {
+      // get the default language of the device
+      this.selectedLanguage = this.translateConfigService.getDefaultLanguage();
+    }
 
   ionViewWillEnter() {
 

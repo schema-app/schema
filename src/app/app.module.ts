@@ -21,12 +21,32 @@ import { HTTP } from '@ionic-native/http/ngx';
 import { FileTransfer } from '@ionic-native/file-transfer/ngx';
 import { File } from '@ionic-native/file/ngx';
 import { InAppBrowser } from '@ionic-native/in-app-browser/ngx';
+import { HttpClientModule, HttpClient } from '@angular/common/http';
+import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
+import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 
+export function LanguageLoader(http: HttpClient) {
+  return new TranslateHttpLoader(http, 'assets/i18n/', '.json');
+}
 
 @NgModule({
   declarations: [AppComponent],
   entryComponents: [],
-  imports: [BrowserModule, HttpModule, ChartsModule, IonicModule.forRoot(), IonicStorageModule.forRoot(), AppRoutingModule],
+  imports: [
+    BrowserModule, 
+    HttpModule, 
+    ChartsModule, 
+    IonicModule.forRoot(), 
+    IonicStorageModule.forRoot(), 
+    AppRoutingModule,
+    HttpClientModule,
+    TranslateModule.forRoot({
+      loader: {
+        provide: TranslateLoader,
+        useFactory: (LanguageLoader),
+        deps: [HttpClient]
+      }
+    })],
   providers: [
     StatusBar,
     SplashScreen,
