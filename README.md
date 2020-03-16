@@ -17,9 +17,9 @@ It supports:
 
 # Citation
 If you use schema in your own research, please cite the following:
-> Shatte, A., & Teague, S. (2019, June 12). schema: An open-source, distributed mobile platform for deploying mHealth research tools and interventions. Retrieved from [https://osf.io/7vzpm](osf.io/7vzpm)
+> Shatte, A. B. R., & Teague, S. J. (2019, June 12). schema: An open-source, distributed mobile platform for deploying mHealth research tools and interventions. [https://doi.org/10.31219/osf.io/7vzpm](https://doi.org/10.31219/osf.io/7vzpm)
 
-> Shatte, Adrian, & Teague, Samantha. (2019, June 12). schema (Version 1.0). Zenodo. http://doi.org/10.5281/zenodo.3243918
+> Shatte, A. B. R., & Teague, S. J. (2019, June 12). schema (Version 1.0). Zenodo. http://doi.org/10.5281/zenodo.3243918
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.3243918.svg)](https://doi.org/10.5281/zenodo.3243918)
 
@@ -53,11 +53,11 @@ Install the dependencies and platforms
 $ cd schema
 $ ionic cordova prepare
 ```
-The [Ionic Docs](https://ionicframework.com/docs/installation/cli) contain more detailed instructions.
+The [Ionic Docs](https://ionicframework.com/docs/installation/cli) contain detailed instructions on the next steps.
 
 ## Deploying a study
 To host your own study on the schema platform, the following steps are required:
-* Create a study protocol and upload it to a web server
+* Create a study protocol and upload it to a web server (follow the instructions below or try our [web-based builder](https://bldr.getschema.app/))
 * Create a page on a server to receive post requests and save data
 
 ### Study protocol
@@ -86,6 +86,8 @@ The properties object must define the following attributes:
 | ```banner_url``` | String | The URL to an image that will be displayed on the home page of your study. It will be displayed at 100% width and maintain the aspect ratio of the original image. | ```"banner_url": "https://getschema.app/banner.png"``` |
 | ```support_email``` | String | An email address that participants can contact for support with the study. | ```"support_email": "support@getschema.app"``` |
 | ```support_url``` | String | A web link to the study's homepage or support information that is linked to in the app. | ```"support_url": "https://getschema.app/"``` |
+| ```ethics``` | String | An ethics statement for the study. | ```"ethics": "This study was approved by ethics committee with approval number 0093423"``` |
+| ```pls``` | String | A web URL to a PDF file containing the study's Plain Language Statement. | ```"pls": "https://getschema.app/pls.pdf"``` |
 | ```empty_msg``` | String | A message displayed to the user when there are no tasks currently available to complete. | ```"empty_msg": "Relax, you're all up to date."``` |
 | ```post_url``` | String | An endpoint to receive participant responses (POST data) from the app. | ```"post_url": "https://getschema.app/post.php"``` |
 | ```conditions``` | Array | A list of conditions that participants can be randomised into. | ```"conditions": [ "Control", "Intervention" ] ``` |
