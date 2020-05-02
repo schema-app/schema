@@ -17,7 +17,7 @@ It supports:
 
 # Citation
 If you use schema in your own research, please cite the following:
-> Shatte, A. B. R., & Teague, S. J. (2019, June 12). schema: An open-source, distributed mobile platform for deploying mHealth research tools and interventions. [https://doi.org/10.31219/osf.io/7vzpm](https://doi.org/10.31219/osf.io/7vzpm)
+> Shatte, A. B. R., & Teague, S. J. (2020). schema: An open-source, distributed mobile platform for deploying mHealth research tools and interventions. BMC Medical Research Methodology, 20(1), 1-12. Retrieved from [https://bmcmedresmethodol.biomedcentral.com/articles/10.1186/s12874-020-00973-5](https://bmcmedresmethodol.biomedcentral.com/articles/10.1186/s12874-020-00973-5)
 
 > Shatte, A. B. R., & Teague, S. J. (2019, June 12). schema (Version 1.0). Zenodo. http://doi.org/10.5281/zenodo.3243918
 
