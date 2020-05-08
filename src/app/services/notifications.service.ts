@@ -10,6 +10,25 @@ export class NotificationsService {
   constructor(private localNotifications: LocalNotifications,
     private storage: Storage) { }
 
+    /**
+   * Schedules a notification, takoing parameters from a task
+   * @param task The task that the notification is for
+   */
+  scheduleDummyNotification() {
+    this.localNotifications.schedule({
+      title: "Hello",
+      text: "World",
+      foreground: true,
+      trigger: {at: new Date(new Date().getTime() + 10000)},
+      smallIcon: 'res://notification_icon',
+      icon: 'res//notification_icon',
+      data: { task_index: 0 },
+      launch: true,
+      wakeup: true,
+      priority: 2
+    });
+  }
+
   /**
    * Schedules a notification, takoing parameters from a task
    * @param task The task that the notification is for
@@ -22,7 +41,11 @@ export class NotificationsService {
       foreground: true,
       trigger: { at: new Date(Date.parse(task.time)) },
       smallIcon: 'res://notification_icon',
-      data: { task_index: task.index, task_id: task.task_id, task_time: task.time }
+      icon: 'res//notification_icon',
+      data: { task_index: task.index, task_id: task.task_id, task_time: task.time },
+      launch: true,
+      wakeup: true,
+      priority: 2
     });
   }
 

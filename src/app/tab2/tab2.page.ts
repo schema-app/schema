@@ -3,6 +3,7 @@ import { Storage } from '@ionic/storage';
 import { Chart } from 'chart.js';
 import { ChartsModule } from 'ng2-charts';
 import * as moment from 'moment';
+import { SurveyDataService } from '../services/survey-data.service';
 import { StudyTasksService } from '../services/study-tasks.service';
 import { TranslateConfigService } from '../translate-config.service';
 
@@ -81,6 +82,7 @@ export class Tab2Page {
 
   constructor(private storage: Storage,
     private studyTasksService: StudyTasksService,
+    private surveyDataService: SurveyDataService,
     private translateConfigService: TranslateConfigService) { 
       // get the default language of the device
       this.selectedLanguage = this.translateConfigService.getDefaultLanguage();
@@ -96,13 +98,10 @@ export class Tab2Page {
     // https://github.com/ionic-team/ionic-storage/issues/168
     this.storage.ready().then((localForage) => {
       localForage.ready(() => {
-        Promise.all([this.storage.get("current-study"), this.storage.get("enrolment-date"), this.storage.get("logs")]).then(values => {
+        Promise.all([this.storage.get("current-study"), this.storage.get("enrolment-date")]).then(values => {
           let studyObject = values[0];
           let enrolmentDate = values[1];
 
-        //});
-        // check if user is currently enrolled in study
-        //this.storage.get('current-study').then((studyObject) => {
           if (studyObject !== null) {
 
             this.studyJSON = JSON.parse(studyObject);
@@ -112,18 +111,16 @@ export class Tab2Page {
             this.studyDay = this.diffDays(new Date(enrolmentDate), new Date());
 
             // log the user visiting this tab
-            let logs = values[2];
             let logEvent = {
               timestamp: moment().format(),
+              milliseconds: moment().valueOf(),
               page: 'my-progress',
-              module_index: -1,
-              uploaded: false
+              event: 'entry',
+              module_index: -1
             };
-            logs.push(logEvent);
-            this.storage.set('logs', logs);
+            this.surveyDataService.logPageVisitToServer(logEvent);
 
-            // check if any graphs are available
-            // and add history items
+            // check if any graphs are available and add history items
             this.studyTasksService.getAllTasks().then(tasks => {
               // get all entries for history
               for (let i = 0; i < tasks.length; i++) {
@@ -226,5 +223,18 @@ export class Tab2Page {
     ndays = (tv2 - tv1) / 1000 / 86400;
     ndays = Math.round(ndays - 0.5);
     return ndays;
+  }
+
+  async ionViewWillLeave() {
+    if (this.enrolledInStudy) {
+      let logEvent = {
+        timestamp: moment().format(),
+        milliseconds: moment().valueOf(),
+        page: 'my-progress',
+        event: 'exit',
+        module_index: -1
+      };
+      this.surveyDataService.logPageVisitToServer(logEvent);
+    }
   }
 }

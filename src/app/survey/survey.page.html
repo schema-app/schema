@@ -85,10 +85,10 @@
           <ion-item style="width:100%;text-align:left !important;">
             <ion-label style="display:none;"></ion-label>
             <ion-select *ngIf="question.radio" style="width:100%;max-width:100%;" (ionChange)="setAnswer(question)" [(ngModel)]="question.model" placeholder="Select..." okText="Select" cancelText="Dismiss">
-              <ion-select-option *ngFor="let option of question.options">{{option}}</ion-select-option>
+              <ion-select-option color="secondary" *ngFor="let option of question.options">{{option.text}}</ion-select-option>
             </ion-select>
             <ion-select *ngIf="!question.radio" style="width:100%;max-width:100%;" (ionChange)="setAnswer(question)" [(ngModel)]="question.model" placeholder="Select..." okText="Select" cancelText="Dismiss" multiple>
-              <ion-select-option *ngFor="let option of question.options">{{option}}</ion-select-option>
+              <ion-select-option color="secondary" *ngFor="let option of question.options">{{option.text}}</ion-select-option>
             </ion-select>
           </ion-item>
 
@@ -97,15 +97,15 @@
         <div *ngIf="question.modal == false">
           <ion-radio-group (ionChange)="setAnswer(question)" [(ngModel)]="question.model" *ngIf="question.radio == true">
             <ion-item *ngFor="let option of question.options">
-              <ion-label style="font-size:small;" class="ion-text-wrap">{{option}}</ion-label>
-              <ion-radio value="{{option}}"></ion-radio>
+              <ion-label style="font-size:small;" class="ion-text-wrap">{{option.text}}</ion-label>
+              <ion-radio color="secondary" value="{{option.text}}"></ion-radio>
             </ion-item>
           </ion-radio-group>
   
-          <div radio-group [(ngModel)]="question.model" *ngIf="question.radio == false">
+          <div radio-group *ngIf="question.radio == false">
             <ion-item *ngFor="let option of question.options">
-              <ion-label style="font-size:small;" class="ion-text-wrap">{{option}}</ion-label>
-              <ion-checkbox (click)="changeCheckStatus(option, question)"></ion-checkbox>
+              <ion-label style="font-size:small;" class="ion-text-wrap">{{option.text}}</ion-label>
+              <ion-checkbox color="secondary" (click)="changeCheckStatus(option, question)" [(ngModel)]="option.checked"></ion-checkbox>
             </ion-item>
           </div>
         </div>
@@ -139,8 +139,8 @@
           <ion-segment-button value="{{question.no_text}}">
             {{question.no_text}}
           </ion-segment-button>
-          <br><br>
         </ion-segment>
+        <br>
       </div>
 
       <!-- external -->
@@ -152,7 +152,7 @@
       <div style="width:100%;" item-content *ngIf="question.type == 'file'">
         <p [class.showError]="!question.hideError" [innerHTML]="question.text"></p>
 
-        <ion-button color="primary" fill="outline" size="large" (click)="openExternalFile(question.src)">
+        <ion-button color="primary" fill="outline" (click)="openExternalFile(question.src)">
           <ion-icon slot="start" name="attach"></ion-icon>
           {{question.file_name}}
         </ion-button>

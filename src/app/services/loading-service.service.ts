@@ -36,7 +36,8 @@ export class LoadingService {
   async dismiss() {
     this.isLoading = false;
     this.isCaching = false;
-    return await this.loadingController.dismiss().then(() => console.log('dismissed'));
+    const loader = await this.loadingController.getTop();
+    return await loader.dismiss();
   }
 
 }

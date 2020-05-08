@@ -50,10 +50,10 @@ export class StudyTasksService {
         let alert_title = mod.alerts.title;
         let alert_message = mod.alerts.message;
         let module_type;
-        if (mod.type === "survey") module_type = "ios-checkmark-circle-outline";
-        if (mod.type === "video") module_type = "logo-youtube";
-        if (mod.type === "audio") module_type = "md-headset";
-        if (mod.type === "info") module_type = "md-bulb";
+        if (mod.type === "survey") module_type = "checkmark-circle-outline";
+        if (mod.type === "video") module_type = "film-outline";
+        if (mod.type === "audio") module_type = "headset-outline";
+        if (mod.type === "info") module_type = "bulb-outline";
 
         let module_name = studyObject.modules[i].name;
         let module_index = i;

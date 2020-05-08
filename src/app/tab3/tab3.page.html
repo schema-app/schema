@@ -10,47 +10,53 @@
 <ion-content>
 
   <ion-item-group>
-    <ion-item-divider color="light">{{ 'heading_user-id' | translate:params }}</ion-item-divider>
+    <ion-item-divider color="light">User ID</ion-item-divider>
     <ion-item lines="full">
       {{this.uuid}}
     </ion-item>
   </ion-item-group>
   <ion-item-group [hidden]="!isEnrolled">
-    <ion-item-divider lines="full" color="light">{{ 'heading_notifications' | translate:params }}</ion-item-divider>
+    <ion-item-divider lines="full" color="light">Notifications</ion-item-divider>
     <ion-item lines="full">
-      <ion-label> {{ 'label_enable-notifications' | translate:params }}</ion-label>
+      <ion-label>Enable Notifications</ion-label>
       <ion-toggle color="secondary" (ionChange)="toggleNotifications()" [(ngModel)]="notificationsEnabled"></ion-toggle>
     </ion-item>
-    <ion-item-divider color="light">{{ 'heading_about-this-study' | translate:params }}</ion-item-divider>
+    <div *ngIf="this.study.properties.instructions.length > 0">
+    <ion-item-divider color="light">About this study</ion-item-divider>
     <ion-item lines="full">
       <ion-label style="white-space: pre-wrap !important;" [innerHTML]="this.study.properties.instructions" class="ion-text-wrap">
       </ion-label>
     </ion-item>
-    <ion-item-divider color="light">{{ 'heading_support' | translate:params }}</ion-item-divider>
-    <ion-item lines="full" (click)="openSupportEmail(this.study.properties.support_email, this.study.properties.study_name)" detail>
+    </div>
+    <div *ngIf="this.study.properties.support_email.length > 0 || this.study.properties.support_url.length > 0">
+    <ion-item-divider color="light">Support</ion-item-divider>
+    <ion-item lines="full" *ngIf="this.study.properties.support_email.length > 0" (click)="openSupportEmail(this.study.properties.support_email, this.study.properties.study_name)" detail>
       <ion-label>
-        {{ 'label_contact-us-by-email' | translate:params }}
+        Contact us by email
       </ion-label>
     </ion-item>
-    <ion-item lines="full" (click)="openSupportURL(this.study.properties.support_url)" detail>
+    <ion-item lines="full" *ngIf="this.study.properties.support_url.length > 0" (click)="openSupportURL(this.study.properties.support_url)" detail>
       <ion-label>
-        {{ 'label_support-website' | translate:params }}
+        Support website
       </ion-label>
     </ion-item>
-    <ion-item-divider color="light">{{ 'heading_ethics-information' | translate:params }}</ion-item-divider>
-    <ion-item lines="full">
-      <ion-label style="white-space: pre-wrap !important;" [innerHTML]="this.study.properties.ethics" class="ion-text-wrap">
-      </ion-label>
-    </ion-item>
-    <ion-item lines="full" (click)="openSupportURL(this.study.properties.pls)" detail>
-      <ion-label>
-        {{ 'label_plain-language-statement' | translate:params }}
-      </ion-label>
-    </ion-item>
-    <ion-item-divider color="light">{{ 'heading_withdraw' | translate:params }}</ion-item-divider>
+    </div>
+    <div *ngIf="this.study.properties.ethics.length > 0 || this.study.properties.pls.length > 0">
+      <ion-item-divider color="light">Ethics Information</ion-item-divider>
+      <ion-item lines="full" *ngIf="this.study.properties.ethics.length > 0">
+        <ion-label style="white-space: pre-wrap !important;" [innerHTML]="this.study.properties.ethics" class="ion-text-wrap">
+        </ion-label>
+      </ion-item>
+      <ion-item lines="full" *ngIf="this.study.properties.pls.length > 0" (click)="openSupportURL(this.study.properties.pls)" detail>
+        <ion-label>
+          Plain Language Statement
+        </ion-label>
+      </ion-item>
+    </div>
+    <ion-item-divider color="light">Withdraw</ion-item-divider>
     <ion-item lines="full" (click)="withdrawFromStudy()" detail>
       <ion-label>
-        {{ 'label_withdraw-from-study' | translate:params }}
+        Withdraw from study
       </ion-label>
     </ion-item>
   </ion-item-group>

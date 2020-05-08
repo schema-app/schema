@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { Storage } from '@ionic/storage';
 import { Platform } from '@ionic/angular';
 import { StudyTasksService } from '../services/study-tasks.service';
+import { UuidService } from '../services/uuid.service';
 import { Http, Headers, RequestOptions } from '@angular/http';
 import { HTTP } from '@ionic-native/http/ngx';
 
@@ -14,6 +15,7 @@ export class SurveyDataService {
     private http2: HTTP,
     private storage: Storage,
     private platform: Platform,
+    private uuidService: UuidService,
     private studyTasksService: StudyTasksService) { }
 
   /**
@@ -31,82 +33,136 @@ export class SurveyDataService {
     });
   }
 
+  async saveToLocalStorage(key, data) {
+    this.storage.set(key, data);
+  }
+
   /**
-   * Attempts to submit a survey response to the server along with the relevant metadata
+   * Attempts to submit a survey response to the server, and if unsuccessful saves it for later attempts
+   * @param surveyData An object containing all metadata about a survey response
    */
-  postDataToServer() {
+  sendSurveyDataToServer(surveyData) {
+    return Promise.all([this.storage.get("current-study"), this.storage.get("uuid"), this.studyTasksService.getAllTasks()]).then((values) => {
+      let studyJSON = JSON.parse(values[0]);
+      let uuid = values[1];
+      let tasks = values[2];
+      let dataUuid = this.uuidService.generateUUIDForData();
 
-    this.studyTasksService.getAllTasks().then(tasks => {
-      Promise.all([this.storage.get("current-study"), this.storage.get("uuid"), this.storage.get("logs")]).then(values => {
+      // create form data to store the survey data 
+      let bodyData = new FormData();
+      // type of post data
+      bodyData.append("data_type", "survey_response");
+      // user id
+      bodyData.append("user_id", uuid);
+      // study id 
+      bodyData.append("study_id", studyJSON.properties.study_id);
+      // module index 
+      bodyData.append("module_index", surveyData.module_index);
+      // module name
+      bodyData.append("module_name", surveyData.module_name);
+      // responses
+      bodyData.append("responses", JSON.stringify(surveyData.responses));
+      // response time
+      bodyData.append("response_time", surveyData.response_time);
+      // response time in ms
+      bodyData.append("response_time_in_ms", surveyData.response_time_in_ms);
+      // alert time
+      bodyData.append("alert_time", surveyData.alert_time);
+      // platform 
+      bodyData.append("platform", this.platform.platforms()[0]);
 
-        let studyJSON = JSON.parse(values[0]);
-        let uuid = values[1];
-
-        // attempt to post all survey responses
-        for (let i = 0; i < tasks.length; i++) {
-          if (tasks[i].completed && !tasks[i].uploaded) {
-
-            // get all questions and their responses
-            let bodyData = new FormData();
-
-            // type of post data
-            bodyData.append("data_type", "survey_response");
-            // user id
-            bodyData.append("user_id", uuid);
-            // study id 
-            bodyData.append("study_id", studyJSON.properties.study_id);
-            // module index 
-            bodyData.append("module_index", tasks[i].index);
-            // module name
-            bodyData.append("module_name", tasks[i].name);
-            // responses
-            bodyData.append("responses", JSON.stringify(tasks[i].responses));
-            // response time
-            bodyData.append("response_time", tasks[i].response_time);
-            // alert time
-            bodyData.append("alert_time", tasks[i].alert_time);
-            // platform 
-            bodyData.append("platform", this.platform.platforms()[0]);
-
-            this.attemptHttpPost(studyJSON.properties.post_url, bodyData).then(success => {
-              if (success) {
-                tasks[i].uploaded = true;
-                // write the tasks back to storage
-                this.storage.set('study-tasks', tasks);
-              }
-            });
-          }
+      return this.attemptHttpPost(studyJSON.properties.post_url, bodyData).then((postSuccessful) => {
+        if (!postSuccessful) {
+          var object = {};
+          bodyData.forEach(function(value, key){
+              object[key] = value;
+          });
+          var json = JSON.stringify(object);
+          this.storage.set(dataUuid, json);
         }
+      });
+    });
+  }
 
-        // attempt to post all log data
-        let logs = values[2];
+  /**
+   * Attempts to send a log (e.g. page visit) to the server, and if unsuccessful saves it for later attempts
+   * @param logEvent An object containing metadata about a log event
+   */
+  logPageVisitToServer(logEvent) {
+    return Promise.all([this.storage.get("current-study"), this.storage.get("uuid")]).then(values => {
+      let studyJSON = JSON.parse(values[0]);
+      let uuid = values[1];
+      let logUuid = this.uuidService.generateUUIDForLog();
 
-        for (let i = 0; i < logs.length; i++) {
-          if (logs[i].uploaded === false) {
-            let bodyData = new FormData();
-            // type of post_data
-            bodyData.append("data_type", "log");
-            // append user id
-            bodyData.append("user_id", uuid);
-            // study id 
-            bodyData.append("study_id", studyJSON.properties.study_id);
-            // module index
-            bodyData.append("module_index", logs[i].module_index);
-            // page
-            bodyData.append("page", logs[i].page);
-            // timestamp
-            bodyData.append("timestamp", logs[i].timestamp);
-            // platform 
-            bodyData.append("platform", this.platform.platforms()[0]);
+      // create form data to store the log data
+      let bodyData = new FormData();
+      // type of post_data
+      bodyData.append("data_type", "log");
+      // append user id
+      bodyData.append("user_id", uuid);
+      // study id 
+      bodyData.append("study_id", studyJSON.properties.study_id);
+      // module index
+      bodyData.append("module_index", logEvent.module_index);
+      // page
+      bodyData.append("page", logEvent.page);
+      // event
+      bodyData.append("event", logEvent.event);
+      // timestamp
+      bodyData.append("timestamp", logEvent.timestamp);
+      // timestamp in milliseconds
+      bodyData.append("timestamp_in_ms", logEvent.milliseconds);
+      // platform 
+      bodyData.append("platform", this.platform.platforms()[0]);
 
-            this.attemptHttpPost(studyJSON.properties.post_url, bodyData).then(success => {
-              if (success) {
-                logs[i].uploaded = true;
-                this.storage.set('logs', logs);
-              }
-            });
-          }
+      return this.attemptHttpPost(studyJSON.properties.post_url, bodyData).then((postSuccessful) => {
+        if (!postSuccessful) {
+          var object = {};
+          bodyData.forEach(function(value, key){
+              object[key] = value;
+          });
+          var json = JSON.stringify(object);
+          this.storage.set(logUuid, json);
         }
+      });
+    });
+  }
+
+  /**
+   * Attempts to upload any logs/data that was unsuccessfully sent to the server on previous attempts
+   * @param dataType The type of data to attempt to upload, e.g. 'pending-logs' (log events) or 'pending-data' (survey responses)
+   */
+  uploadPendingData(dataType) {
+    return Promise.all([this.storage.get("current-study"), this.storage.keys()]).then(values => {
+      let studyJSON = JSON.parse(values[0]);
+      let keys = values[1];
+
+      let pendingLogKeys = [];
+      for (let i = 0; i < keys.length; i++) {
+        if (keys[i].startsWith(dataType)) {
+          pendingLogKeys.push(keys[i]);
+        }
+      }
+      return {
+        pendingLogKeys: pendingLogKeys,
+        post_url: studyJSON.properties.post_url
+      };
+    }).then((data) => {
+      data.pendingLogKeys.map(pendingKey => {
+        this.storage.get(pendingKey).then((log) => {
+          let logJSONObj = JSON.parse(log);
+          let bodyData = new FormData();
+          for (var key in logJSONObj) {
+            if (logJSONObj.hasOwnProperty(key)) {
+              bodyData.append(key, logJSONObj[key]);
+            }
+          }
+          this.attemptHttpPost(data.post_url, bodyData).then((postSuccessful) => {
+            if (postSuccessful) {
+              this.storage.remove(pendingKey);
+            }
+          });
+        });
       });
     });
   }

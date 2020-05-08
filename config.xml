@@ -1,10 +1,11 @@
 <?xml version='1.0' encoding='utf-8'?>
-<widget android-versionCode="6" id="app.getschema" version="1.1" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+<widget android-versionCode="9" id="app.getschema" version="1.2" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
     <name>schema</name>
     <description>A survey/intervention platform.</description>
     <author email="schemamobile@gmail.com" href="https://getschema.app/">Adrian Shatte and Sam Teague</author>
     <content src="index.html" />
     <access origin="*" />
+    <allow-navigation href="http://localhost:8080/*" />
     <allow-intent href="http://*/*" />
     <allow-intent href="https://*/*" />
     <allow-intent href="file://*/*" />
@@ -49,6 +50,12 @@
         <resource-file src="resources/android/notification-icon/icon-xxxhdpi.png" target="res/drawable-xxxhdpi/notification_icon.png" />
     </platform>
     <platform name="ios">
+        <preference name="WKWebViewOnly" value="true" />
+        <feature name="CDVWKWebViewEngine">
+            <param name="ios-package" value="CDVWKWebViewEngine" />
+        </feature>
+        <preference name="CordovaWebViewEngine" value="CDVWKWebViewEngine" />
+        <preference name="WKSuspendInBackground" value="true" />
         <allow-navigation href="*" />
         <allow-intent href="itms:*" />
         <allow-intent href="itms-apps:*" />

@@ -12,7 +12,7 @@
   <ion-item lines="none" *ngIf="!(graphs.length > 0)">
     <ion-label class="ion-text-wrap ion-text-center">
       <br><br>
-      <ion-icon id="stats-icon" color="secondary" name="stats"></ion-icon><br><br>
+      <ion-icon id="stats-icon" color="secondary" name="stats-chart"></ion-icon><br><br>
       {{ 'placeholder_my-progress' | translate:params }}<br><br>
     </ion-label>
   </ion-item>
@@ -35,9 +35,9 @@
     </div>
 
     <div *ngIf="enrolledInStudy">
-      <ion-item-divider *ngIf="history.length > 0">
+      <ion-item-divider color="light" *ngIf="history.length > 0">
         <ion-label>
-          {{ 'heading_recently-completed' | translate:params }}
+          Recently Completed
         </ion-label>
       </ion-item-divider>
       

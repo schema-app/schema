@@ -1,9 +1,10 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, NgZone } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
 import { ActivatedRoute } from '@angular/router';
 import { Storage } from '@ionic/storage';
 import { StatusBar } from '@ionic-native/status-bar/ngx';
 import { StudyTasksService } from '../services/study-tasks.service';
+import { SurveyDataService } from '../services/survey-data.service';
 import { NavController, IonContent, ToastController } from '@ionic/angular';
 import { InAppBrowser } from '@ionic-native/in-app-browser/ngx';
 import * as moment from 'moment';
@@ -15,7 +16,7 @@ import * as moment from 'moment';
 })
 export class SurveyPage implements OnInit {
 
-  @ViewChild(IonContent) content: IonContent;
+  @ViewChild(IonContent, {static: false}) content: IonContent;
 
   // the text to display as submit button label
   submit_text = "Submit";
@@ -42,6 +43,8 @@ export class SurveyPage implements OnInit {
   tasks;
   task_id;
   task_index;
+  module_index;
+  module_name;
 
   constructor(private route: ActivatedRoute,
     private storage: Storage,
@@ -49,7 +52,9 @@ export class SurveyPage implements OnInit {
     private domSanitizer: DomSanitizer,
     private navController: NavController,
     private studyTasksService: StudyTasksService,
+    private surveyDataService: SurveyDataService,
     private toastController: ToastController,
+    private ngZone: NgZone,
     private iab: InAppBrowser) { }
 
   /**
@@ -76,29 +81,44 @@ export class SurveyPage implements OnInit {
     // https://github.com/ionic-team/ionic-storage/issues/168
     this.storage.ready().then((localForage) => {
       localForage.ready(() => {
-        Promise.all([this.storage.get("current-study"), this.storage.get("uuid"), this.storage.get("logs")]).then(values => {
+        Promise.all([this.storage.get("current-study"), this.storage.get("uuid")]).then(values => {
 
           let studyObject = values[0];
           let uuid = values [1];
-
-          let module_index;
 
           // get the task object for this task
           this.studyTasksService.getAllTasks().then(tasks => {
             this.tasks = tasks;
             for (let i = 0; i < this.tasks.length; i++) {
               if (this.task_id == this.tasks[i].task_id) {
-                module_index = this.tasks[i].index;
+                this.module_name = this.tasks[i].name;
+                this.module_index = this.tasks[i].index;
                 this.task_index = i;
                 break;
               }
             }
 
+            // check if this task is valid
+            let availableTasks = this.studyTasksService.getTaskDisplayList().then(tasks => {
+              let taskAvailable = false;
+              for (let i = 0; i < tasks.length; i++) {
+                let task = tasks[i];
+                if (task.task_id == this.task_id) {
+                  taskAvailable = true;
+                  break;
+                }
+              }
+              if (!taskAvailable) {
+                this.showToast("This task had a time limit and is no longer available.", "bottom");
+                this.navController.navigateRoot('/');
+              } 
+            });
+
             // extract the JSON from the study object
             this.study = JSON.parse(studyObject);
 
             // get the correct module
-            this.survey = this.study.modules[module_index];
+            this.survey = this.study.modules[this.module_index];
 
             // shuffle modules if required
             if (this.survey.shuffle) {
@@ -188,15 +208,14 @@ export class SurveyPage implements OnInit {
             }
 
             // log the user visiting this tab
-            let logs = values[2];
             let logEvent = {
               timestamp: moment().format(),
+              milliseconds: moment().valueOf(),
               page: 'survey',
-              module_index: module_index,
-              uploaded: false
+              event: 'entry',
+              module_index: this.module_index
             };
-            logs.push(logEvent);
-            this.storage.set('logs', logs);
+            this.surveyDataService.logPageVisitToServer(logEvent);
           });
         });
       });
@@ -208,10 +227,23 @@ export class SurveyPage implements OnInit {
    */
   back() {
     if (this.current_section > 1) {
-      this.current_section = this.current_section - 1;
-      this.current_section_name = this.survey.sections[this.current_section - 1].name;
-      this.submit_text = "Next";
+      this.ngZone.run(() => {
+        this.current_section--;
+        this.current_section_name = this.survey.sections[this.current_section - 1].name;
+        this.questions = this.survey.sections[this.current_section - 1].questions;
+        this.submit_text = "Next";
+      });
     } else {
+      // save an exit log
+      let logEvent = {
+        timestamp: moment().format(),
+        milliseconds: moment().valueOf(),
+        page: 'survey',
+        event: 'exit',
+        module_index: this.module_index
+      };
+      this.surveyDataService.logPageVisitToServer(logEvent);
+      // nav back to the home screen
       this.navController.navigateRoot('/');
     }
   }
@@ -267,6 +299,13 @@ export class SurveyPage implements OnInit {
           // for checkbox items, the response is set to an empty array
         } else if (question.type === 'multi') {
 
+          // set up checked tracking for checkbox questions types
+          let tempOptions = [];
+          for (let i = 0; i < question.options.length; i++) {
+            tempOptions.push({text: question.options[i], checked: false});
+          }
+          question.options = tempOptions;
+
           // counterbalance the choices if necessary
           if (question.shuffle) {
             question.options = this.shuffle(question.options);
@@ -313,12 +352,12 @@ export class SurveyPage implements OnInit {
 
     // if the checked item was unchecked then remove it
     // otherwise add it to the response array
-    if (responses.indexOf(option) > -1) {
+    if (responses.indexOf(option.text) > -1) {
       // remove it
-      let index = responses.indexOf(option);
+      let index = responses.indexOf(option.text);
       if (index !== -1) responses.splice(index, 1);
     } else {
-      responses.push(option);
+      responses.push(option.text);
     }
 
     // write the array back to a single string
@@ -337,8 +376,8 @@ export class SurveyPage implements OnInit {
    * @param url The url of the PDF file to open
    */
   openExternalFile(url) {
-    //console.log(url);
-    const browser = this.iab.create(url, "_blank", {usewkwebview: "yes"});
+    //const browser = this.iab.create(url, "_blank", {usewkwebview: "yes"});
+    const browser = this.iab.create(url, "_system");
   }
 
   toggleDynamicQuestions(question) {
@@ -388,7 +427,6 @@ export class SurveyPage implements OnInit {
         }
       }
     }
-
   }
 
   /**
@@ -417,21 +455,18 @@ export class SurveyPage implements OnInit {
         // add the alert time to the response
         this.tasks[this.task_index].alert_time = moment(this.tasks[this.task_index].time).format();
 
-        // get a timestamp of submission time
-        //let options = { weekday: 'short', day: '2-digit', month: '2-digit', hour: 'numeric', minute: 'numeric' };
-        //let response_time = new Date().toLocaleString("en-US", options);
+        // get a timestmap of submission time in both readable and ms format
         let response_time = moment().format();
         this.tasks[this.task_index].response_time = response_time;
+
+        let response_time_ms = moment().valueOf();
+        this.tasks[this.task_index].response_time_ms = response_time_ms;
 
         // indicate that the current task is completed
         this.tasks[this.task_index].completed = true;
 
-        // reset the uploaded flag to false to ensure sticky data is sent to the server
-        this.tasks[this.task_index].uploaded = false;
-
-        let responses = {};
-
         // add all of the responses to an object in the task to be sent to server
+        let responses = {};
         for (let i = 0; i < this.survey.sections.length; i++) {
           for (let j = 0; j < this.survey.sections[i].questions.length; j++) {
             let question = this.survey.sections[i].questions[j];
@@ -439,24 +474,45 @@ export class SurveyPage implements OnInit {
           }
         }
         this.tasks[this.task_index].responses = responses;
+        
+        // create an object to store the surveyResponse and attempt to post to server
+        let surveyResponse = {
+          module_index: this.module_index,
+          module_name: this.module_name,
+          responses: responses,
+          response_time: response_time,
+          response_time_in_ms: response_time_ms,
+          alert_time: this.tasks[this.task_index].alert_time
+        };
+        this.surveyDataService.sendSurveyDataToServer(surveyResponse);
 
         // write tasks back to storage
         this.storage.set("study-tasks", this.tasks).then(() => {
-          // navigate to the home tab
+          // save an exit log
+          let logEvent = {
+            timestamp: moment().format(),
+            milliseconds: moment().valueOf(),
+            page: 'survey',
+            event: 'submit',
+            module_index: this.module_index
+          };
+          this.surveyDataService.logPageVisitToServer(logEvent);
           this.navController.navigateRoot('/');
         });
 
       } else {
-        this.current_section++;
-        this.questions = this.survey.sections[this.current_section - 1].questions;
-        this.current_section_name = this.survey.sections[this.current_section - 1].name;
-
-        if (this.current_section === this.num_sections) {
-          this.submit_text = this.survey.submit_text;
-        }
-
-        this.content.scrollToTop(0);
-        //this.changeRef.detectChanges();
+        this.ngZone.run(() => {
+          this.current_section++;
+          this.questions = this.survey.sections[this.current_section - 1].questions;
+          this.current_section_name = this.survey.sections[this.current_section - 1].name;
+  
+          if (this.current_section === this.num_sections) {
+            this.submit_text = this.survey.submit_text;
+          }
+  
+          //this.changeRef.detectChanges();
+          this.content.scrollToTop(0);
+        });
       }
     } else {
       this.content.scrollToTop(500);
@@ -472,11 +528,17 @@ export class SurveyPage implements OnInit {
   async showToast(message, position) {
     const toast = await this.toastController.create({
       message: message,
-      color: "danger",
       position: position,
-      showCloseButton: true,
       keyboardClose: true,
-      closeButtonText: "Dismiss"
+      color: "danger",
+      buttons: [
+        {
+          text: 'Dismiss',
+          role: 'cancel',
+          handler: () => {
+          }
+        }
+      ]
     });
 
     toast.present();

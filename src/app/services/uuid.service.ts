@@ -18,4 +18,26 @@ export class UuidService {
     }
     return rtn;
   }
+
+  generateUUIDForData() {
+    let ALPHABET = '23456789ABDEGJKMNPQRVWXYZ';
+    let ID_LENGTH = 20;
+
+    let rtn = '';
+    for (let i = 0; i < ID_LENGTH; i++) {
+      rtn += ALPHABET.charAt(Math.floor(Math.random() * ALPHABET.length));
+    }
+    return 'pending-data' + rtn;
+  }
+
+  generateUUIDForLog() {
+    let ALPHABET = '23456789ABDEGJKMNPQRVWXYZ';
+    let ID_LENGTH = 20;
+
+    let rtn = '';
+    for (let i = 0; i < ID_LENGTH; i++) {
+      rtn += ALPHABET.charAt(Math.floor(Math.random() * ALPHABET.length));
+    }
+    return 'pending-log' + rtn;
+  }
 }

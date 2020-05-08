@@ -6,6 +6,7 @@ import { SurveyCacheService } from '../services/survey-cache.service';
 import { InAppBrowser } from '@ionic-native/in-app-browser/ngx';
 import * as moment from 'moment';
 import { TranslateConfigService } from '../translate-config.service';
+import { SurveyDataService } from '../services/survey-data.service';
 
 @Component({
   selector: 'app-tab3',
@@ -44,7 +45,8 @@ export class Tab3Page {
     private iab: InAppBrowser,
     private surveyCacheService: SurveyCacheService,
     private notificsationsService: NotificationsService,
-    private translateConfigService: TranslateConfigService) {
+    private translateConfigService: TranslateConfigService,
+    private surveyDataService: SurveyDataService) {
       // get the default language of the device
       this.selectedLanguage = this.translateConfigService.getDefaultLanguage();
     }
@@ -57,7 +59,7 @@ export class Tab3Page {
     this.storage.ready().then((localForage) => {
       localForage.ready(() => {
 
-        Promise.all([this.storage.get("current-study"), this.storage.get("uuid"), this.storage.get("notifications-enabled"), this.storage.get("logs")]).then(values => {
+        Promise.all([this.storage.get("current-study"), this.storage.get("uuid"), this.storage.get("notifications-enabled")]).then(values => {
 
           // check if user is currently enrolled in study
           // to show/hide additional options
@@ -78,19 +80,30 @@ export class Tab3Page {
           else this.notificationsEnabled = notificationsEnabled;
 
           // log the user visiting this tab
-          let logs = values[3];
           let logEvent = {
             timestamp: moment().format(),
+            milliseconds: moment().valueOf(),
             page: 'settings',
-            module_index: -1,
-            uploaded: false
-            //
+            event: 'entry',
+            module_index: -1
           };
-          logs.push(logEvent);
-          this.storage.set('logs', logs);
+          this.surveyDataService.logPageVisitToServer(logEvent);
         }); 
       });
     });
+  }
+
+  ionViewWillLeave() {
+    if (this.isEnrolled) {
+      let logEvent = {
+        timestamp: moment().format(),
+        milliseconds: moment().valueOf(),
+        page: 'settings',
+        event: 'exit',
+        module_index: -1
+      };
+      this.surveyDataService.logPageVisitToServer(logEvent);
+    }
   }
 
   /**
@@ -100,30 +113,37 @@ export class Tab3Page {
     const alert = await this.alertController.create({
       header: 'Are you sure?',
       message: 'By withdrawing, you will lose all progress.',
+      cssClass: 'alertStyle',
       buttons: [
         {
           text: 'Cancel',
-          role: 'cancel',
-          cssClass: 'secondary'
+          role: 'cancel'
         }, {
           text: 'Withdraw',
           handler: () => {
-            // remove the study data from storage
-            this.storage.remove("current-study").then(() => {
-              this.storage.remove('study-tasks').then(() => {
-                this.storage.remove('logs').then(() => {
-
-                
-                  // cancel all notifications
-                  this.notificsationsService.cancelAllNotifications();
-
-                  // delete all cached data
-                  this.storage.remove("logs");
-
-                  // navigate to the home tab
-                  this.navController.navigateRoot('/');
-                });
-              });
+            // log a withdraw event to the server
+            let logEvent = {
+              timestamp: moment().format(),
+              milliseconds: moment().valueOf(),
+              page: 'settings',
+              event: 'withdraw',
+              module_index: -1
+            };
+            this.surveyDataService.logPageVisitToServer(logEvent);
+            // upload any pending logs and data
+            this.surveyDataService.uploadPendingData('pending-log').then(() => {
+              return this.surveyDataService.uploadPendingData('pending-data');
+            }).then(() => {
+              return this.storage.remove('current-study');
+              // then remove all the pending study tasks from storage
+            }).then(() => {
+              return this.storage.remove('study-tasks');
+            // then cancel all remaining notifications and navigate to home
+            }).then(() => {
+              // cancel all notifications
+              this.notificsationsService.cancelAllNotifications();
+              // navigate to the home tab
+              this.navController.navigateRoot('/');
             });
           }
         }
