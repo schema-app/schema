@@ -60,7 +60,7 @@ schema uses the [ngx-translate](https://github.com/ngx-translate/core) library f
 
 ## Deploying a study
 To host your own study on the schema platform, the following steps are required:
-* Create a study protocol and upload it to a web server (follow the instructions below or try our [web-based builder](https://bldr.getschema.app/))
+* Create a study protocol and upload it to a web server (follow the instructions below)
 * Create a page on a server to receive post requests and save data
 
 ### Study protocol
