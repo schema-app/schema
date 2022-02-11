@@ -3,7 +3,7 @@
     "study_name": "Demo Study",
     "study_id": "DEMO01",
     "instructions": "Any specific information or instructions for your users goes here.",
-    "post_url": "https://your-website/post.phpjojoj",
+    "post_url": "http://localhost:8081",
     "empty_msg": "No tasks to complete!",
     "banner_url": "https://your-website/banner.png",
     "support_url": "https://your-website/support",
@@ -50,27 +50,6 @@
       ],
       "shuffle": false
     },
-    {
-      "type": "video",
-      "name": "Week 1: Unwind",
-      "submit_text": "FINISH",
-      "alerts": {
-        "duration": 1,
-        "random": false,
-        "sticky": false,
-        "times": [
-          {
-            "hours": 7,
-            "minutes": 0
-          }
-        ],
-        "start_offset": 0,
-        "random_interval": 30,
-        "timeout": false,
-        "timeout_after": 60000,
-        "title": "Welcome to the study!",
-        "message": "Tap to open the app."
-      },
       "graph": {
         "display": false
       },
