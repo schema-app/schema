@@ -105,7 +105,6 @@
         }
       ],
       "shuffle": false
-    },
     {
       "type": "survey",
       "name": "Sleep Diary",
@@ -140,39 +139,45 @@
           "name": "Sleep Diary",
           "questions": [
             {
-              "id": "sleep_q0",
+              "id": "m_q0",
               "type": "media",
               "subtype": "image",
               "src": "https://your-website/image.png"
             },
             {
-              "id": "sleep_q1",
+              "id": "m_q1",
               "type": "instruction",
-              "text": "Please answer the following questions about your sleep last night."
+              "text": "Please answer the following questions about your child's words learning progress in a 'People' category ."
             },
             {
-              "id": "sleep_q2",
-              "type": "text",
-              "subtype": "numeric",
-              "required": true,
-              "text": "The number of hours I slept last night in total:"
+              "id": "m_q2",
+              "type": "multi",
+              "text": "Baby",
+              "radio": false,
+              "shuffle": true,
+              "options": [
+                "Understands",
+                "Understands and uses"
             },
             {
-              "id": "sleep_q3",
-              "type": "datetime",
-              "subtype": "time",
-              "required": true,
-              "text": "I went to bed last night at:"
+              "id": "m_q3",
+              "type": "multi",
+              "text": "Clown",
+              "radio": false,
+              "shuffle": true,
+              "options": [
+                "Understands",
+                "Understands and uses"
             },
             {
-              "id": "sleep_q4",
+              "id": "m_q4",
               "type": "datetime",
               "required": true,
               "text": "I got out of bed this morning at:",
               "subtype": "time"
             },
             {
-              "id": "sleep_q5",
+              "id": "m_q5",
               "type": "multi",
               "radio": true,
               "required": true,
