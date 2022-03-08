@@ -145,8 +145,8 @@ The alerts object must define the following attributes:
 | ```random_interval``` | Integer | The number of minutes before and after that an alert time should be randomised. For example, if the alert is scheduled for 8.30am and the ```random_interval``` is 30, the alert will be scheduled randomly between 8 and 9am. | ```"random_interval": 30``` |
 | ```sticky``` | boolean | Indicates whether the module should remain available in the Tasks list upon response, allowing the user to access this module repeatedly. | ```"sticky": true``` |
 | ```sticky_label``` | String | A title that appears above a sticky module on the home screen. Multiple sticky modules that are set to appear in succession will be grouped under this title. | ```"sticky_label": "Warm up videos"``` |
-| ```timeout``` | Boolean | If ```timeout``` is true, the task will disappear from the list after the number of minutes specified in ```timeout_after``` have elapsed (if the module is not completed before this time). | ```"timeout": true``` |
-| ```timeout_after``` | Integer | The number of minutes after a task is displayed that it will disappear from the list. ```timeout``` must be ```true``` for this to have any effect. | ```"timeout_after": 30``` |
+| ```timeout``` | Boolean | If ```timeout``` is true, the task will disappear from the list after the number of milliseconds specified in ```timeout_after``` have elapsed (if the module is not completed before this time). | ```"timeout": true``` |
+| ```timeout_after``` | Integer | The number of milliseconds after a task is displayed that it will disappear from the list. ```timeout``` must be ```true``` for this to have any effect. | ```"timeout_after": 300000``` |
 
 ##### Graph
 The graphs object must define the following attributes:
