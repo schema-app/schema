@@ -15,11 +15,11 @@
   </ion-refresher>
 
   <!-- Displayed if user is not enrolled in a study -->
-  <ion-img src="assets/imgs/dark_circle.png" *ngIf="darkMode" [hidden]="hideEnrolOptions" style="height:40%;margin-top:10%;margin-left:auto;margin-right:auto;"></ion-img>
-    <ion-img src="assets/imgs/light_circle.png" *ngIf="!darkMode" [hidden]="hideEnrolOptions" style="height:35%;margin-top:10%;margin-left:auto;margin-right:auto;"></ion-img>
+  <ion-img src="assets/imgs/dark_circle.png" *ngIf="darkMode" [hidden]="hideEnrolOptions" class="enrolment-img-dark"></ion-img>
+    <ion-img src="assets/imgs/light_circle.png" *ngIf="!darkMode" [hidden]="hideEnrolOptions" class="enrolment-img-light"></ion-img>
     <div [hidden]="hideEnrolOptions" style="margin-top:5%">
       <h1 style="text-align:center;">Let's get started</h1>
-      <p style="text-align:center;width:80%;margin-left:auto;margin-right:auto;">
+      <p class="welcome-msg">
         Welcome to <span style="color:#04998b;">schema</span> - a platform to participate in research surveys directly from your smartphone.
       </p>
     </div>
@@ -28,13 +28,6 @@
 
     <ion-img *ngIf="study !== null" [hidden]="!hideEnrolOptions" [src]="study.properties.banner_url" style="width:101%;margin-left:-1px"></ion-img>
 
-    <!--<ion-item-divider color="primary" [hidden]="!hideEnrolOptions">
-      <strong>Tasks</strong>
-        <ion-button (click)="sortTasksList()" fill="clear" slot="end">
-          <ion-icon name="swap" slot="icon-only" class="rotate-90"></ion-icon>
-        </ion-button>
-    </ion-item-divider>-->
-
     <div *ngFor="let task of task_list" [hidden]="!hideEnrolOptions">
       <ion-item *ngIf="task.type !== 'header'" detail>
         <ion-icon color="medium" name="{{task.type}}" slot="start"></ion-icon>
@@ -42,7 +35,6 @@
           <span [innerHTML]="task.name"></span>
           <br>
           <span *ngIf="!task.sticky" class="moment">{{task.moment}}</span>
-          <!--<span *ngIf="task.sticky" class="moment">{{task.sticky_label}}</span>-->
         </ion-label>
       </ion-item>
 
@@ -52,19 +44,6 @@
         </ion-label>
       </ion-item-divider>
     </div>
-
-    <!--<ion-item *ngFor="let task of task_list" detail [hidden]="!hideEnrolOptions">
-
-      <ion-icon *ngIf="task.type !== 'header'" color="secondary" name="{{task.type}}" slot="start"></ion-icon>
-      <ion-label *ngIf="task.type !== 'header'" [routerLink]="'/survey/' + task.task_id" routerDirection="forward" class="ion-text-wrap">
-        <span [innerHTML]="task.name"></span>
-        <br>
-        <span *ngIf="!task.sticky" class="moment">{{task.moment}}</span>
-      </ion-label>
-      <ion-label *ngIf="task.type === 'header'">
-        Header: {{task.label}}
-      </ion-label>
-    </ion-item>-->
 
     <ion-item lines="none" class="ion-text-center" [hidden]="task_list.length">
       <ion-label *ngIf="study !== null" class="ion-text-wrap">
@@ -78,10 +57,10 @@
 </ion-content>
 
 <ion-footer [hidden]="hideEnrolOptions">
-  <p *ngIf="darkMode" style="color:#ffffff;text-align:center;width:80%;margin-left: auto;margin-right:auto;margin-bottom:5%;font-weight:bold;">
+  <p *ngIf="darkMode" style="color:#ffffff;" class="enrolment-text">
     To begin, enrol in a study:
   </p>
-  <p *ngIf="!darkMode" style="color:#000000;text-align:center;width:80%;margin-left: auto;margin-right:auto;margin-bottom:5%;font-weight:bold;">
+  <p *ngIf="!darkMode" style="color:#000000;" class="enrolment-text">
     To begin, enrol in a study:
   </p>
   <ion-item (click)="scanBarcode()" lines="none">

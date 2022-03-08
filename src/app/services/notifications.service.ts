@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Storage } from '@ionic/storage';
-import { LocalNotifications, ELocalNotificationTriggerUnit } from '@ionic-native/local-notifications/ngx';
+import { LocalNotifications } from '@ionic-native/local-notifications/ngx';
 
 @Injectable({
   providedIn: 'root'
@@ -11,7 +11,7 @@ export class NotificationsService {
     private storage: Storage) { }
 
     /**
-   * Schedules a notification, takoing parameters from a task
+   * Schedules a notification, taking parameters from a task
    * @param task The task that the notification is for
    */
   scheduleDummyNotification() {
@@ -26,7 +26,7 @@ export class NotificationsService {
       launch: true,
       wakeup: true,
       priority: 2
-    });
+    })
   }
 
   /**
@@ -46,54 +46,70 @@ export class NotificationsService {
       launch: true,
       wakeup: true,
       priority: 2
-    });
+    })
   }
 
   /**
    * Cancels all notifications that have been set
    */
   cancelAllNotifications() {
-    this.localNotifications.cancelAll();
+    this.localNotifications.cancelAll()
   }
 
   /**
    * Sets the next 30 notifications based on the next 30 tasks
    */
-  setNext30Notifications() {
-    this.localNotifications.cancelAll().then(() => {
-      // localForage used as workaround to db readiness issues
-      // https://github.com/ionic-team/ionic-storage/issues/168
-      this.storage.ready().then((localForage) => {
-        localForage.ready(() => {
-          this.storage.get('notifications-enabled').then(notificationsEnabled => {
-            if (notificationsEnabled) {
-              this.storage.get('study-tasks').then((tasks) => {
-                if (tasks !== null) {
-                  var alertCount = 0;
-                  for (var i = 0; i < tasks.length; i++) {
-                    var task = tasks[i];
-                    var alertTime = new Date(Date.parse(task.time));
+  async setNext30Notifications() {
+    await this.localNotifications.cancelAll()
 
-                    // now
-                    var now = new Date();
+    const notificationsEnabled = await this.storage.get('notifications-enabled')
 
-                    if (alertTime > now) {
-                      if (this.checkTaskIsUnlocked(task, tasks)) {
-                        this.scheduleNotification(task);
-                        alertCount++;
-                      }
-                    }
+    if (notificationsEnabled) {
+      const tasks = await this.storage.get('study-tasks')
+      if (tasks !== null) {
+        var alertCount = 0
+        for (var i = 0; i < tasks.length; i++) {
+          var task = tasks[i]
+          var alertTime = new Date(Date.parse(task.time))
 
-                    // only set 30 alerts into the future
-                    if (alertCount === 30) break;
+          if (alertTime > new Date()) {
+            if (this.checkTaskIsUnlocked(task, tasks)) {
+              this.scheduleNotification(task)
+              alertCount++
+            }
+          }
+
+          // only set 30 alerts into the future
+          if (alertCount === 30) break
+        }
+      }
+    }
+
+    /*this.localNotifications.cancelAll().then(() => {
+      this.storage.get('notifications-enabled').then(notificationsEnabled => {
+        if (notificationsEnabled) {
+          this.storage.get('study-tasks').then((tasks) => {
+            if (tasks !== null) {
+              var alertCount = 0;
+              for (var i = 0; i < tasks.length; i++) {
+                var task = tasks[i];
+                var alertTime = new Date(Date.parse(task.time));
+
+                if (alertTime > new Date()) {
+                  if (this.checkTaskIsUnlocked(task, tasks)) {
+                    this.scheduleNotification(task);
+                    alertCount++;
                   }
                 }
-              });
+
+                // only set 30 alerts into the future
+                if (alertCount === 30) break;
+              }
             }
           });
-        });
+        }
       });
-    });
+    });*/
   }
 
     /**
@@ -104,7 +120,7 @@ export class NotificationsService {
   checkTaskIsUnlocked(task, study_tasks) {
 
     // get a set of completed task uuids
-    let completedUUIDs = new Set();
+    let completedUUIDs = new Set()
     for (let i = 0; i < study_tasks.length; i++) {
       if (study_tasks[i].completed) {
         completedUUIDs.add(study_tasks[i].uuid);
@@ -112,15 +128,15 @@ export class NotificationsService {
     }
 
     // get the list of prereqs from the task
-    let prereqs = task.unlock_after;
-    let unlock = true;
+    let prereqs = task.unlock_after
+    let unlock = true
     for (let i = 0; i < prereqs.length; i++) {
       if (!completedUUIDs.has(prereqs[i])) {
-        unlock = false;
-        break;
+        unlock = false
+        break
       }
     }
 
-    return unlock;
+    return unlock
   }
 }

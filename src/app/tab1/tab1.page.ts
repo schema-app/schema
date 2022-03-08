@@ -24,23 +24,22 @@ import {TranslateService} from '@ngx-translate/core';
 export class Tab1Page {
 
   // resume event subscription
-  resumeEvent;
+  resumeEvent: any
   // flag to display enrol options
-  hideEnrolOptions = true;
+  hideEnrolOptions: boolean = true
   // track whether the user is currently enrolled in a study
-  isEnrolledInStudy = false;
+  isEnrolledInStudy: boolean = false
   // stores the details of the study
-  study = null;
+  study: any = null
   // stores the list of tasks to be completed by the user
-  task_list = [];
-
+  task_list: Array<any> = new Array()
   // dark mode
-  darkMode = false;
+  darkMode: boolean = false
 
   //translations loaded from the appropriate language file
   // defaults are provided but will be overridden if language file 
   // is loaded successfully
-  translations = {
+  translations: any = {
     "btn_cancel": "Cancel",
     "btn_dismiss": "Dismiss",
     "btn_enrol": "Enrol",
@@ -52,12 +51,12 @@ export class Tab1Page {
     "label_loading": "Loading...",
     "msg_caching": "Downloading media for offline use - please wait!",
     "msg_camera": "Camera permission is required to scan QR codes. You can allow this permission in Settings."
-  };
+  }
   
-  safeURL;
+  safeURL: string;
 
   // the current language of the device
-  selectedLanguage;
+  selectedLanguage: string;
 
   constructor(private barcodeScanner : BarcodeScanner,
     private surveyDataService : SurveyDataService,
@@ -75,21 +74,21 @@ export class Tab1Page {
     private translateConfigService: TranslateConfigService,
     private translate: TranslateService) {
       // get the default language of the device
-      this.selectedLanguage = this.translateConfigService.getDefaultLanguage();
+      this.selectedLanguage = this.translateConfigService.getDefaultLanguage()
     }
 
     colorTest(systemInitiatedDark) {
       if (systemInitiatedDark.matches) {
-        this.darkMode = true;	
+        this.darkMode = true
       } else {
-        this.darkMode = false;
+        this.darkMode = false
       }
     }
 
     ngOnInit() {
       // set statusBar to be visible on Android
-      this.statusBar.styleLightContent();
-      this.statusBar.backgroundColorByHexString('#0F2042');
+      this.statusBar.styleLightContent()
+      this.statusBar.backgroundColorByHexString('#0F2042')
 
       // need to subscribe to this event in order
       // to ensure that the page will refresh every
@@ -98,7 +97,7 @@ export class Tab1Page {
       this.router.events.subscribe(event => {
         if(event instanceof NavigationStart) {
           if(event.url == '/') {
-            if (!this.loadingService.isLoading) this.ionViewWillEnter();
+            if (!this.loadingService.isLoading) this.ionViewWillEnter()
           }
         }
       });
@@ -106,9 +105,9 @@ export class Tab1Page {
       // trigger this to run every time the app is resumed from the background
       this.resumeEvent = this.platform.resume.subscribe(() => {
         if (this.router.url === "/tabs/tab1") {
-          if (!this.loadingService.isLoading) this.ionViewWillEnter();
+          if (!this.loadingService.isLoading) this.ionViewWillEnter()
         }
-      });
+      })
     }
 
   ionViewWillEnter() {
@@ -116,13 +115,13 @@ export class Tab1Page {
     // check if dark mode
     if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
       // dark mode
-      this.darkMode = true;
+      this.darkMode = true
     } else {
-      this.darkMode = false;
+      this.darkMode = false
     }
 
     // load the correct translations for dynamic labels/messages
-    let labels = [
+    const labels = [
       "btn_cancel",
       "btn_dismiss",
       "btn_enrol",
@@ -135,72 +134,64 @@ export class Tab1Page {
       "msg_caching",
       "msg_camera"
     ];
-    this.translate.get(labels).subscribe(res => { this.translations = res; });
+    this.translate.get(labels).subscribe(res => { this.translations = res; })
 
-    this.localNotifications.requestPermission();
+    this.localNotifications.requestPermission()
 
-    this.loadingService.isCaching = false;
-    this.loadingService.present(this.translations["label_loading"]);
+    this.loadingService.isCaching = false
+    this.loadingService.present(this.translations["label_loading"])
 
-    this.hideEnrolOptions = true;
-    this.isEnrolledInStudy = false;
+    this.hideEnrolOptions = true
+    this.isEnrolledInStudy = false
     
-    // localForage used as workaround to db readiness issues
-    // https://github.com/ionic-team/ionic-storage/issues/168
-    this.storage.ready().then((localForage) => {
-      localForage.ready(() => {
 
-        // check if user is currently enrolled in study
-        Promise.all([this.storage.get("current-study")]).then(values => {
+    // check if user is currently enrolled in study
+    Promise.all([this.storage.get("current-study")]).then(values => {
 
-        //this.storage.get('current-study').then((studyObject) => {
-          let studyObject = values[0];
-          if (studyObject !== null) {
+      const studyObject = values[0]
+      if (studyObject !== null) {
 
-            // convert the study to a JSON object
-            this.study = JSON.parse(studyObject);
+        // convert the study to a JSON object
+        this.study = JSON.parse(studyObject)
 
-            // log the user visiting this tab
-            let logEvent = {
-              timestamp: moment().format(),
-              milliseconds: moment().valueOf(),
-              page: 'home',
-              event: 'entry',
-              module_index: -1
-            };
-            this.surveyDataService.logPageVisitToServer(logEvent);
+        // log the user visiting this tab
+        this.surveyDataService.logPageVisitToServer({
+          timestamp: moment().format(),
+          milliseconds: moment().valueOf(),
+          page: 'home',
+          event: 'entry',
+          module_index: -1
+        })
 
-            // attempt to upload any pending logs and survey data
-            this.surveyDataService.uploadPendingData("pending-log");
-            this.surveyDataService.uploadPendingData("pending-data");
+        // attempt to upload any pending logs and survey data
+        this.surveyDataService.uploadPendingData("pending-log")
+        this.surveyDataService.uploadPendingData("pending-data")
 
-            // set up next round of notifications
-            this.notificationsService.setNext30Notifications();
+        // set up next round of notifications
+        this.notificationsService.setNext30Notifications()
             
-            // load the study tasks
-            this.loadStudyDetails();
-          } else {
-            this.hideEnrolOptions = false;
+        // load the study tasks
+        this.loadStudyDetails()
+      } else {
+        this.hideEnrolOptions = false
 
-            this.loadingService.dismiss();
-          } 
-        });
-
-        // on first run, generate a UUID for the user
-        // and set the notifications-enabled to true
-        this.storage.get('uuid-set').then((uuidSet) => {
-          if (!uuidSet) {
-            // set a UUID
-            let uuid = this.uuidService.generateUUID();
-            this.storage.set('uuid', uuid);
-            // set a flag that UUID was set
-            this.storage.set('uuid-set', true);
-            // set a flag that notifications are enabled
-            this.storage.set('notifications-enabled', true);
-          } 
-        });
-      });
+        this.loadingService.dismiss()
+      } 
     });
+
+    // on first run, generate a UUID for the user
+    // and set the notifications-enabled to true
+    this.storage.get('uuid-set').then((uuidSet) => {
+      if (!uuidSet) {
+        // set a UUID
+        const uuid = this.uuidService.generateUUID("")
+        this.storage.set('uuid', uuid)
+        // set a flag that UUID was set
+        this.storage.set('uuid-set', true)
+        // set a flag that notifications are enabled
+        this.storage.set('notifications-enabled', true)
+      } 
+    })
   }
 
   /**
@@ -209,18 +200,17 @@ export class Tab1Page {
   ionViewWillLeave() { 
     if (this.isEnrolledInStudy) {
       // log the user exiting this tab
-      let logEvent = {
+      this.surveyDataService.logPageVisitToServer({
         timestamp: moment().format(),
         milliseconds: moment().valueOf(),
         page: 'home',
         event: 'exit',
         module_index: -1
-      };
-      this.surveyDataService.logPageVisitToServer(logEvent);
+      })
 
       // attempt to upload any pending logs and survey data
-      this.surveyDataService.uploadPendingData("pending-log");
-      this.surveyDataService.uploadPendingData("pending-data");
+      this.surveyDataService.uploadPendingData("pending-log")
+      this.surveyDataService.uploadPendingData("pending-data")
     }
   }
 
@@ -230,29 +220,29 @@ export class Tab1Page {
    */
   attemptToDownloadStudy(url, isQRCode) {
     // show loading bar
-    this.loadingService.isCaching = false;
-    this.loadingService.present(this.translations["label_loading"]);
+    this.loadingService.isCaching = false
+    this.loadingService.present(this.translations["label_loading"])
 
     this.surveyDataService.getRemoteData(url).then(data => {
   
       // check if the data received from the URL contains JSON properties/modules
       // in order to determine if it's a schema study before continuing
-      let validStudy = false;
+      let validStudy = false
       try {
         // checks if the returned text is parseable as JSON, and whether it contains
         // some of the key fields used by schema so it can determine whether it is
         // actually a schema study URL
         validStudy = JSON.parse(data['data']).properties !== undefined
                   && JSON.parse(data['data']).modules !== undefined
-                  && JSON.parse(data['data']).properties.study_id !== undefined;
+                  && JSON.parse(data['data']).properties.study_id !== undefined
       } catch(e) {
-        validStudy = false;
+        validStudy = false
       }
       if (validStudy) {
-        this.enrolInStudy(data);
+        this.enrolInStudy(data)
       } else {
-        this.loadingService.dismiss();
-        this.displayEnrolError(isQRCode);
+        this.loadingService.dismiss()
+        this.displayEnrolError(isQRCode)
       }
     });  
   }
@@ -263,11 +253,11 @@ export class Tab1Page {
   async scanBarcode() {
     this.barcodeScanner.scan().then(barcodeData => {
       if (!barcodeData.cancelled) {
-        this.attemptToDownloadStudy(barcodeData.text, true);
+        this.attemptToDownloadStudy(barcodeData.text, true)
       } 
      }).catch(err => {
-        this.loadingService.dismiss();
-        this.displayBarcodeError();
+        this.loadingService.dismiss()
+        this.displayBarcodeError()
      });
   }
 
@@ -294,13 +284,13 @@ export class Tab1Page {
           }, {
             text: this.translations["btn_enrol"],
             handler: response => {
-              this.attemptToDownloadStudy(response.url, false);
+              this.attemptToDownloadStudy(response.url, false)
             }
           }
         ]
-      });
+      })
   
-      await alert.present();
+      await alert.present()
   }
 
   /**
@@ -327,14 +317,14 @@ export class Tab1Page {
           text: this.translations["btn_enrol"],
           handler: response => {
             // create URL for study
-            let url = "https://getschema.app/study.php?study_id=" + response.id;
-            this.attemptToDownloadStudy(url, false);
+            const url = "https://getschema.app/study.php?study_id=" + response.id
+            this.attemptToDownloadStudy(url, false)
           }
         }
       ]
-    });
+    })
 
-    await alert.present();
+    await alert.present()
   }
 
   /**
@@ -342,44 +332,43 @@ export class Tab1Page {
    * @param data A data object returned from the server to represent a study object
    */
   enrolInStudy(data) {
-    this.isEnrolledInStudy = true;
-    this.hideEnrolOptions = true;
+    this.isEnrolledInStudy = true
+    this.hideEnrolOptions = true
 
     // convert received data to JSON object
     this.study = JSON.parse(data['data']);
 
     // set the enrolled date
-    this.storage.set('enrolment-date', new Date());
+    this.storage.set('enrolment-date', new Date())
 
     // set an enrolled flag and save the JSON for the current study
     this.storage.set('current-study', JSON.stringify(this.study)).then(() => {
       // log the enrolment event
-      let logEvent = {
+      this.surveyDataService.logPageVisitToServer({
         timestamp: moment().format(),
         milliseconds: moment().valueOf(),
         page: 'home',
         event: 'enrol',
         module_index: -1
-      };
-      this.surveyDataService.logPageVisitToServer(logEvent);
+      })
 
       // cache all media files if this study has set this property to true
       if (this.study.properties.cache === true) {
 
         this.loadingService.dismiss().then(() => {
-          this.loadingService.isCaching = true;
-          this.loadingService.present(this.translations["msg_caching"]);
-        });
-        this.surveyCacheService.cacheAllMedia(this.study);
+          this.loadingService.isCaching = true
+          this.loadingService.present(this.translations["msg_caching"])
+        })
+        this.surveyCacheService.cacheAllMedia(this.study)
       }
 
       // setup the study task objects
-      this.studyTasksService.generateStudyTasks(this.study);
+      this.studyTasksService.generateStudyTasks(this.study)
 
       // setup the notifications
-      this.notificationsService.setNext30Notifications();
+      this.notificationsService.setNext30Notifications()
                 
-      this.loadStudyDetails();
+      this.loadStudyDetails()
     });
   }
 
@@ -392,23 +381,23 @@ export class Tab1Page {
       this.task_list = tasks;
 
       for (let i = 0; i < this.task_list.length; i++) {
-        this.task_list[i].moment = moment(this.task_list[i].locale).fromNow();
+        this.task_list[i].moment = moment(this.task_list[i].locale).fromNow()
       }
 
       // show the study tasks
-      this.isEnrolledInStudy = true;
-      this.hideEnrolOptions = true;
+      this.isEnrolledInStudy = true
+      this.hideEnrolOptions = true
 
       // reverse the order of the tasks list to show oldest first
-      this.sortTasksList();
+      this.sortTasksList()
 
       // hide loading controller if not caching
       if (!this.loadingService.isCaching) {
         setTimeout(() => {
-          this.loadingService.dismiss();
-        }, 1000);
+          this.loadingService.dismiss()
+        }, 1000)
       }
-    });
+    })
   }
 
   /**
@@ -416,44 +405,44 @@ export class Tab1Page {
    * @param isQRCode Denotes whether the error was caused via QR code enrolment
    */
   async displayEnrolError(isQRCode) {
-    let msg = isQRCode ? "We couldn't load your study. Please check your internet connection and ensure you are scanning the correct code." : "We couldn't load your study. Please check your internet connection and ensure you are entering the correct URL or ID.";
+    const msg = isQRCode ? "We couldn't load your study. Please check your internet connection and ensure you are scanning the correct code." : "We couldn't load your study. Please check your internet connection and ensure you are entering the correct URL or ID."
     const alert = await this.alertController.create({
       header: "Oops...",
       message: msg,
       cssClass: 'alertStyle',
       buttons: ["Dismiss"]
     });
-    await alert.present();
+    await alert.present()
   }
 
   /**
    * Displays a message when camera permission is not allowed
    */
   async displayBarcodeError() {
-    let msg = "Camera permission is required to scan QR codes. You must allow this permission if you wish to use this feature.";
+    const msg = "Camera permission is required to scan QR codes. You must allow this permission if you wish to use this feature.";
     const alert = await this.alertController.create({
       header: "Permission Required",
       cssClass: 'alertStyle',
       message: msg,
       buttons: ["Dismiss"]
-    });
-    await alert.present();
+    })
+    await alert.present()
   }
 
   /**
    * Reverses the list of tasks for sorting purposes
    */
   sortTasksList() {
-    this.task_list.reverse();
+    this.task_list.reverse()
   }
 
   /**
    * Refreshes the list of tasks
    */
   doRefresh(refresher) {
-    if (!this.loadingService.isLoading) this.ionViewWillEnter();
+    if (!this.loadingService.isLoading) this.ionViewWillEnter()
     setTimeout(() => {
-      refresher.target.complete();
-    }, 250);
+      refresher.target.complete()
+    }, 250)
   }
 }
