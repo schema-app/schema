@@ -9,14 +9,14 @@ import { Storage } from '@ionic/storage';
 })
 export class SurveyCacheService {
 
-  win: any = window;
+  win: any = window
 
-  mediaToCache = {};
-  videoThumbnailsToCache = {};
-  localMediaURLs = {};
-  localThumbnailURLs = {};
-  mediaCount = 0;
-  mediaDownloadedCount = 0;
+  mediaToCache:object = {}
+  videoThumbnailsToCache:object = {}
+  localMediaURLs:object = {}
+  localThumbnailURLs:object = {}
+  mediaCount:number = 0
+  mediaDownloadedCount:number = 0
 
   constructor(private fileTransfer: FileTransfer,
     private file: File,
@@ -29,18 +29,17 @@ export class SurveyCacheService {
    * @param url Remote URL to a media file
    */
   downloadFile(url) {
-    const transfer: FileTransferObject = this.fileTransfer.create();
+    const transfer: FileTransferObject = this.fileTransfer.create()
 
     // get the fileName from the URL
-    let urlSplit = url.split("/");
-    let fileName = urlSplit[urlSplit.length - 1];
+    const urlSplit = url.split("/")
+    const fileName = urlSplit[urlSplit.length - 1]
 
     return transfer.download(url, this.file.dataDirectory + fileName).then((entry) => {
-      return entry.toURL(); 
+      return entry.toURL()
     }, (error) => {
-      // handle error
-      return "";
-    });
+      return ""
+    })
   }
 
   /**
@@ -49,25 +48,17 @@ export class SurveyCacheService {
    */
   getMediaURLs(study) {
     // get banner url
-    this.mediaToCache["banner"] = study.properties.banner_url;
+    this.mediaToCache["banner"] = study.properties.banner_url
 
     // get urls from media elements
-    for (let i = 0; i < study.modules.length; i++) {
-      for (let j = 0; j < study.modules[i].sections.length; j++) {
-        for (let k = 0; k < study.modules[i].sections[j].questions.length; k++) {
-          let question = study.modules[i].sections[j].questions[k];
-          if (question.type === "media") { 
-            try {
-              this.mediaToCache[question.id] = question.src;
-            } catch(e) {
-              console.log("error: " + e);
-            }
-          }
-        }
+    for (const module of study.modules) {
+      for (const section of module.sections) {
+        const mediaQuestions = section.questions.filter(question => question.type === "media")
+        for (const question of mediaQuestions) this.mediaToCache[question.id] = question.src
       }
     }
     // set mediaCount to be number of media items
-    this.mediaCount = Object.keys(this.mediaToCache).length;
+    this.mediaCount = Object.keys(this.mediaToCache).length
   }
 
   /**
@@ -75,11 +66,11 @@ export class SurveyCacheService {
    * @param study The study protocol
    */
   cacheAllMedia(study) {
-    this.mediaCount = 0;
-    this.mediaDownloadedCount = 0;
+    this.mediaCount = 0
+    this.mediaDownloadedCount = 0
     // map media question ids to their urls
-    this.getMediaURLs(study);
-    this.downloadAllMedia();
+    this.getMediaURLs(study)
+    this.downloadAllMedia()
   }
 
   /**
@@ -87,12 +78,12 @@ export class SurveyCacheService {
    */
   downloadAllMedia() {
     // download all media items
-    let keys = Object.keys(this.mediaToCache);
+    const keys = Object.keys(this.mediaToCache)
     for (let i = 0; i < keys.length; i++) {
       this.downloadFile(this.mediaToCache[keys[i]]).then(entryURL => {
-        this.localMediaURLs[keys[i]] = this.win.Ionic.WebView.convertFileSrc(entryURL);
-        this.mediaDownloadedCount = this.mediaDownloadedCount + 1;
-        this.checkIfFinished();
+        this.localMediaURLs[keys[i]] = this.win.Ionic.WebView.convertFileSrc(entryURL)
+        this.mediaDownloadedCount = this.mediaDownloadedCount + 1
+        this.checkIfFinished()
       });
     }
   }
@@ -101,9 +92,8 @@ export class SurveyCacheService {
    * Checks if all of the media has been downloaded, if so update the protocol 
    */
   checkIfFinished() {
-    if (this.mediaDownloadedCount === this.mediaCount) {
-      this.updateMediaURLsInStudy();
-    }
+    if (this.mediaDownloadedCount === this.mediaCount)
+      this.updateMediaURLsInStudy()
   }
 
   /**
@@ -112,31 +102,27 @@ export class SurveyCacheService {
   updateMediaURLsInStudy() {
     this.storage.get('current-study').then((studyString) => {
       try { 
-        let studyObject = JSON.parse(studyString);
+        const studyObject = JSON.parse(studyString)
         // update the banner url first
-        studyObject.properties.banner_url = this.localMediaURLs["banner"];
+        studyObject.properties.banner_url = this.localMediaURLs["banner"]
 
         // update the other media items to the corresponding local URL
-        for (let i = 0; i < studyObject.modules.length; i++) {
-          for (let j = 0; j < studyObject.modules[i].sections.length; j++) {
-            for (let k = 0; k < studyObject.modules[i].sections[j].questions.length; k++) {
-              let question = studyObject.modules[i].sections[j].questions[k];
-              if (question.id in this.localMediaURLs) {
-                question.src = this.localMediaURLs[question.id];
-                if (question.subtype === "video") question.thumb = this.localMediaURLs["banner"];
-              }
+        // get urls from media elements
+        for (const module of studyObject.modules) 
+          for (const section of module) 
+            for (const question of section) {
+              if (question.id in this.localMediaURLs) question.src = this.localMediaURLs[question.id]
+              if (question.subtype === "video") question.thumb = this.localMediaURLs["banner"]
             }
-          }
-        }
-
+  
         // update the study protocol in storage 
-        this.storage.set('current-study', JSON.stringify(studyObject));
+        this.storage.set('current-study', JSON.stringify(studyObject))
       } catch (e) {
-        console.log("error: " + e);
+        console.log("error: " + e)
       }
 
       // dismiss the loading spinner
-      this.loadingService.dismiss();
-    });
+      this.loadingService.dismiss()
+    })
   }
 }

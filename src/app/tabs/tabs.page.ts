@@ -9,11 +9,11 @@ import { TranslateConfigService } from '../translate-config.service';
 export class TabsPage {
 
   // the current language of the device
-  selectedLanguage:string;
+  selectedLanguage: string
  
   constructor(private translateConfigService: TranslateConfigService){
     // get the default language of the device
-    this.selectedLanguage = this.translateConfigService.getDefaultLanguage();
+    this.selectedLanguage = this.translateConfigService.getDefaultLanguage()
   }
 }
 

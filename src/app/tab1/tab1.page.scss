@@ -1,21 +1,49 @@
 ion-content {
-    --offset-top: 1px;
+	--offset-top: 1px;
 }
 
 .page-home {
+	.moment {
+		font-size: small;
+		color: gray;
+	}
 
-    .moment {
-        font-size:small;
-        color:gray;
-    }
-
-    .rotate-90 {
-        display: inline-block; 
-        transform: rotate(90deg);
-    }
-
+	.rotate-90 {
+		display: inline-block;
+		transform: rotate(90deg);
+	}
 }
 
 .secondary {
-    color: #04998b;
+	color: #04998b;
+}
+
+.welcome-msg {
+	text-align: center;
+	width: 80%;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.enrolment-img-dark {
+	height: 40%;
+	margin-top: 10%;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.enrolment-img-light {
+	height: 35%;
+	margin-top: 10%;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.enrolment-text {
+	text-align: center;
+	width: 80%;
+	margin-left: auto;
+	margin-right: auto;
+	margin-bottom: 5%;
+	font-weight: bold;
 }

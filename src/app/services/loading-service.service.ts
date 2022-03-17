@@ -6,8 +6,8 @@ import { LoadingController } from '@ionic/angular';
 })
 export class LoadingService {
 
-  isLoading = false;
-  isCaching = false;
+  isLoading:boolean = false;
+  isCaching:boolean = false;
 
   constructor(public loadingController: LoadingController) { }
 
@@ -16,7 +16,7 @@ export class LoadingService {
    * @param msg The message to display in the loading dialog
    */
   async present(msg) {
-    this.isLoading = true;
+    this.isLoading = true
     return await this.loadingController.create({
       message: msg,
       spinner: "crescent",
@@ -24,20 +24,20 @@ export class LoadingService {
     }).then(a => {
       a.present().then(() => {
         if (!this.isLoading) {
-          a.dismiss().then(() => console.log('abort presenting'));
+          a.dismiss().then(() => console.log('abort presenting'))
         }
-      });
-    });
+      })
+    })
   }
 
   /**
    * Dismisses the loading dialog
    */
   async dismiss() {
-    this.isLoading = false;
-    this.isCaching = false;
-    const loader = await this.loadingController.getTop();
-    return await loader.dismiss();
+    this.isLoading = false
+    this.isCaching = false
+    const loader = await this.loadingController.getTop()
+    return await loader.dismiss()
   }
 
 }
