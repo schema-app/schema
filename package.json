@@ -50,7 +50,7 @@
     "core-js": "^2.5.4",
     "io": "1.0.0",
     "ionic-cache-src": "^0.1.1",
-    "moment": "^2.24.0",
+    "moment": "^2.29.2",
     "ng2-charts": "^2.2.2",
     "phonegap-plugin-barcodescanner": "8.0.1",
     "rm": "0.1.8",
